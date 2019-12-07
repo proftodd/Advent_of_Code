@@ -1,23 +1,17 @@
 import sys
 
 def hack(guess):
-    str_guess = str(guess)
     repeats = {}
-    prev_digit = int(str_guess[0])
-    for i in range(1, len(str_guess)):
-        this_digit = int(str_guess[i])
+    prev_digit = -1
+    for this_digit in map(int, str(guess)):
         if this_digit < prev_digit:
             return False
         if this_digit == prev_digit:
             if this_digit not in repeats:
-                repeats[this_digit] = 2
-            else:
-                repeats[this_digit] = repeats[this_digit] + 1
+                repeats[this_digit] = 1
+            repeats[this_digit] = repeats[this_digit] + 1
         prev_digit = this_digit
-    for repeat in repeats.values():
-        if repeat == 2:
-            return True
-    return False
+    return any(v == 2 for v in repeats.values())
 
 def main():
     min, max, *_ = sys.argv[1:]
