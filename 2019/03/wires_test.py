@@ -35,6 +35,19 @@ def test_segment_intersection():
     assert wires.Segment.intersection(s1, s3) == None
     assert wires.Segment.intersection(s1, s4) == None
 
+def test_segment_distance_to_point():
+    s1 = wires.Segment(wires.Point(-1, 0), wires.Point(1, 0))
+    s2 = wires.Segment(wires.Point(1, 0), wires.Point(1, 2))
+    p = wires.Path()
+    p.add_segment(s1)
+    p.add_segment(s2)
+    p1 = wires.Point(0, 0)
+    p2 = wires.Point(1, 1)
+    p3 = wires.Point(2, 0)
+    assert p.distance_to(p1) == 1
+    assert p.distance_to(p2) == 3
+    assert p.distance_to(p3) == 4
+
 def test_wire_intersection():
     s1 = wires.Segment(wires.Point(-1, -1), wires.Point(-1, 2))
     s2 = wires.Segment(wires.Point(-1, 2), wires.Point(1, 2))

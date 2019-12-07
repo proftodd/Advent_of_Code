@@ -64,6 +64,16 @@ class Path:
     def add_segment(self, segment):
         self.segments.append(segment)
     
+    def distance_to(self, pt):
+        distance = 0
+        for s in self.segments:
+            if s.contains(pt):
+                distance = distance + Point.manhattan_distance(s.p1, pt)
+                break
+            else:
+                distance = distance + Point.manhattan_distance(s.p1, s.p2)
+        return distance
+
     @staticmethod
     def intersection(p1, p2):
         pairs = [(s1, s2) for s1 in p1.segments for s2 in p2.segments]
