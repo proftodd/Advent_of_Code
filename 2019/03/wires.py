@@ -110,8 +110,7 @@ def main():
     if len(intersection_points) == 0:
         print('no intersections found')
     else:
-        origin = Point(0, 0)
-        distances = [Point.manhattan_distance(origin, p) for p in intersection_points]
+        distances = [w1.distance_to(p) + w2.distance_to(p) for p in intersection_points]
         distances.sort()
         print(f"closest intsersection is {distances[0]}")
 
