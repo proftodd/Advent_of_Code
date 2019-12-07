@@ -29,6 +29,17 @@ class Segment:
     def is_vertical(self):
         return self.p1.x == self.p2.x
     
+    def contains(self, pt):
+        lesser = None
+        if self.p1.x < self.p2.x:
+            lesser = self.p1
+        elif self.p1.x == self.p2.x:
+            lesser = self.p1 if self.p1.y < self.p2.y else self.p2
+        else:
+            lesser = self.p2
+        greater = self.p2 if lesser == self.p1 else self.p1
+        return lesser.x <= pt.x and pt.x <= greater.x and lesser.y <= pt.y and pt.y <= greater.y
+
     @staticmethod
     def intersection(s1, s2):
         if (s1.is_horizontal() and s2.is_horizontal()) or (s1.is_vertical() and s2.is_vertical()):
@@ -40,7 +51,6 @@ class Segment:
         lowermost_point = the_vertical_one.p1 if the_vertical_one.p1.y < the_vertical_one.p2.y else the_vertical_one.p2
         uppermost_point = the_vertical_one.p1 if the_vertical_one.p1.y > the_vertical_one.p2.y else the_vertical_one.p2
         if leftmost_point.x < the_vertical_one.p1.x and the_vertical_one.p1.x < rightmost_point.x and lowermost_point.y < the_horizontal_one.p1.y and the_horizontal_one.p1.y < uppermost_point.y:
-            intersection = Point(the_vertical_one.p1.x, the_horizontal_one.p1.y)
             return Point(the_vertical_one.p1.x, the_horizontal_one.p1.y)
         return None
 

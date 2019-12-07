@@ -16,6 +16,16 @@ def test_manhattan_distance():
     p2 = wires.Point(1, 1)
     assert wires.Point.manhattan_distance(p1, p2) == 2
 
+def test_segment_contains_point():
+    p1 = wires.Point(1, 0)
+    p2 = wires.Point(0, 1)
+    s1 = wires.Segment(wires.Point(-1, 0), wires.Point(1, 0))
+    s2 = wires.Segment(wires.Point(0, -1), wires.Point(0, 1))
+    assert s1.contains(p1)
+    assert s2.contains(p2)
+    assert not s1.contains(p2)
+    assert not s2.contains(p1)
+
 def test_segment_intersection():
     s1 = wires.Segment(wires.Point(-1, 0), wires.Point(1, 0))
     s2 = wires.Segment(wires.Point(0, -1), wires.Point(0, 1))
