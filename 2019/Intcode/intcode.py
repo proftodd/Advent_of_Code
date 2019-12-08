@@ -6,13 +6,10 @@ POSITION_MODE = 0
 IMMEDIATE_MODE = 1
 
 class Instruction(ABC):
+
     def __init__(self, modes=[], parameters=[]):
         self.modes = modes
         self.parameters = parameters
-
-    @abstractmethod
-    def name(self):
-        pass
 
     @abstractmethod
     def expected_parameters():
@@ -68,17 +65,16 @@ class Instruction(ABC):
             return Equals(modes, memory[parameter_start : parameter_end])
 
 class Stop(Instruction):
-    def name(self):
-        return 'Stop'
 
     @staticmethod
     def expected_parameters():
         return 0
 
     def act(self, instr_ptr, memory):
-        return instr_ptr + 1 + self.expected_parameters()
+        return -1
 
 class Addition(Instruction):
+
     def name(self):
         return 'Addition'
 
@@ -93,8 +89,6 @@ class Addition(Instruction):
         return instr_ptr + 1 + self.expected_parameters()
 
 class Multiplication(Instruction):
-    def name(self):
-        return 'Multiplication'
 
     @staticmethod
     def expected_parameters():
@@ -107,9 +101,7 @@ class Multiplication(Instruction):
         return instr_ptr + 1 + self.expected_parameters()
 
 class Input(Instruction):
-    def name(self):
-        return 'Input'
-    
+
     @staticmethod
     def expected_parameters():
         return 1
@@ -122,8 +114,6 @@ class Input(Instruction):
 
 
 class Output(Instruction):
-    def name(self):
-        return 'Output'
 
     @staticmethod
     def expected_parameters():
@@ -135,9 +125,7 @@ class Output(Instruction):
         return instr_ptr + 1 + self.expected_parameters()
 
 class JumpIfTrue(Instruction):
-    def name(self):
-        return 'JumpIfTrue'
-    
+
     @staticmethod
     def expected_parameters():
         return 2
@@ -151,9 +139,7 @@ class JumpIfTrue(Instruction):
             return instr_ptr + 1 + self.expected_parameters()
 
 class JumpIfFalse(Instruction):
-    def name(self):
-        return 'JumpIfFalse'
-    
+
     @staticmethod
     def expected_parameters():
         return 2
@@ -167,9 +153,7 @@ class JumpIfFalse(Instruction):
             return destination
 
 class LessThan(Instruction):
-    def name(self):
-        return 'LessThan'
-    
+
     @staticmethod
     def expected_parameters():
         return 3
@@ -185,9 +169,7 @@ class LessThan(Instruction):
         return instr_ptr + 1 + self.expected_parameters()
 
 class Equals(Instruction):
-    def name(self):
-        return 'Equals'
-    
+
     @staticmethod
     def expected_parameters():
         return 3
@@ -215,8 +197,7 @@ class Intcode():
 
     def run_program(self):
         self.instr_ptr = 0
-        current_instr = None
-        while current_instr == None or current_instr.name() is not 'Stop':
+        while self.instr_ptr >= 0:
             current_instr = Instruction.create_instruction(self.instr_ptr, self.memory)
             self.instr_ptr = current_instr.act(self.instr_ptr, self.memory)
 
