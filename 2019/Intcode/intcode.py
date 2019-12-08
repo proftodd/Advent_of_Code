@@ -3,8 +3,8 @@ import sys
 from abc import ABC, abstractmethod
 
 class Instruction(ABC):
-    def __init__(self, parameters=None):
-        self.parameters = parameters if parameters else []
+    def __init__(self, parameters=[]):
+        self.parameters = parameters
 
     @abstractmethod
     def name(self):
@@ -20,14 +20,14 @@ class Instruction(ABC):
 
     @staticmethod
     def create_instruction(instr_ptr, memory):
-        if memory[instr_ptr] == '99':
+        if memory[instr_ptr] == 99:
             new_instr_ptr = instr_ptr + Stop.length()
             return (new_instr_ptr, Stop())
-        elif memory[instr_ptr] == '1':
+        elif memory[instr_ptr] == 1:
             parameter_start = instr_ptr + 1
             new_instr_ptr = instr_ptr + Addition.length()
             return (new_instr_ptr, Addition(memory[parameter_start : new_instr_ptr]))
-        elif memory[instr_ptr] == '2':
+        elif memory[instr_ptr] == 2:
             parameter_start = instr_ptr + 1
             new_instr_ptr = instr_ptr + Multiplication.length()
             return (new_instr_ptr, Multiplication(memory[parameter_start : new_instr_ptr]))
@@ -52,9 +52,9 @@ class Addition(Instruction):
         return 4
 
     def act(self, memory):
-        arg1 = int(memory[int(self.parameters[0])])
-        arg2 = int(memory[int(self.parameters[1])])
-        memory[int(self.parameters[2])] = str(arg1 + arg2)
+        arg1 = memory[self.parameters[0]]
+        arg2 = memory[self.parameters[1]]
+        memory[self.parameters[2]] = arg1 + arg2
 
 class Multiplication(Instruction):
     def name(self):
@@ -65,9 +65,9 @@ class Multiplication(Instruction):
         return 4
 
     def act(self, memory):
-        arg1 = int(memory[int(self.parameters[0])])
-        arg2 = int(memory[int(self.parameters[1])])
-        memory[int(self.parameters[2])] = str(arg1 * arg2)
+        arg1 = memory[self.parameters[0]]
+        arg2 = memory[self.parameters[1]]
+        memory[self.parameters[2]] = arg1 * arg2
 
 class Intcode():
 
@@ -78,7 +78,7 @@ class Intcode():
         fp = open(filename, 'r')
         line = fp.readline().strip()
         fp.close()
-        self.memory = line.split(',')
+        self.memory = list(map(int, line.split(',')))
 
     def run_program(self):
         self.instr_ptr = 0
@@ -88,7 +88,7 @@ class Intcode():
             current_instr.act(self.memory)
 
     def write_memory(self):
-        print(','.join(self.memory))
+        print(','.join([str(i) for i in self.memory]))
 
 def main():
     intcode = Intcode()
