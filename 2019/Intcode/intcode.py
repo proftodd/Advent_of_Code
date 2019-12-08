@@ -46,6 +46,26 @@ class Instruction(ABC):
         elif instr_code == 4:
             parameter_end = parameter_start + Output.expected_parameters()
             return Output([POSITION_MODE], memory[parameter_start : parameter_end])
+        elif instr_code == 5:
+            parameter_end = parameter_start + JumpIfTrue.expected_parameters()
+            while len(modes) < JumpIfTrue.expected_parameters():
+                modes.insert(0, POSITION_MODE)
+            return JumpIfTrue(modes, memory[parameter_start : parameter_end])
+        elif instr_code == 6:
+            parameter_end = parameter_start + JumpIfFalse.expected_parameters()
+            while len(modes) < JumpIfFalse.expected_parameters():
+                modes.insert(0, POSITION_MODE)
+            return JumpIfFalse(modes, memory[parameter_start : parameter_end])
+        elif instr_code == 7:
+            parameter_end = parameter_start + LessThan.expected_parameters()
+            while len(modes) < LessThan.expected_parameters():
+                modes.insert(0, POSITION_MODE)
+            return LessThan(modes, memory[parameter_start : parameter_end])
+        elif instr_code == 8:
+            parameter_end = parameter_start + Equals.expected_parameters()
+            while len(modes) < Equals.expected_parameters():
+                modes.insert(0, POSITION_MODE)
+            return Equals(modes, memory[parameter_start : parameter_end])
 
 class Stop(Instruction):
     def name(self):
@@ -112,6 +132,74 @@ class Output(Instruction):
     def act(self, instr_ptr, memory):
         source = self.parameters[0]
         print(memory[source])
+        return instr_ptr + 1 + self.expected_parameters()
+
+class JumpIfTrue(Instruction):
+    def name(self):
+        return 'JumpIfTrue'
+    
+    @staticmethod
+    def expected_parameters():
+        return 2
+
+    def act(self, instr_ptr, memory):
+        condition =   self.parameters[0] if self.modes[-1] else memory[self.parameters[0]]
+        destination = self.parameters[1] if self.modes[-2] else memory[self.parameters[1]]
+        if condition:
+            return destination
+        else:
+            return instr_ptr + 1 + self.expected_parameters()
+
+class JumpIfFalse(Instruction):
+    def name(self):
+        return 'JumpIfFalse'
+    
+    @staticmethod
+    def expected_parameters():
+        return 2
+
+    def act(self, instr_ptr, memory):
+        condition =   self.parameters[0] if self.modes[-1] else memory[self.parameters[0]]
+        destination = self.parameters[1] if self.modes[-2] else memory[self.parameters[1]]
+        if condition:
+            return instr_ptr + 1 + self.expected_parameters()
+        else:
+            return destination
+
+class LessThan(Instruction):
+    def name(self):
+        return 'LessThan'
+    
+    @staticmethod
+    def expected_parameters():
+        return 3
+    
+    def act(self, instr_ptr, memory):
+        arg1 = self.parameters[0] if self.modes[-1] else memory[self.parameters[0]]
+        arg2 = self.parameters[1] if self.modes[-2] else memory[self.parameters[1]]
+        dest = self.parameters[2]
+        if arg1 < arg2:
+            memory[dest] = 1
+        else:
+            memory[dest] = 0
+        return instr_ptr + 1 + self.expected_parameters()
+
+class Equals(Instruction):
+    def name(self):
+        return 'Equals'
+    
+    @staticmethod
+    def expected_parameters():
+        return 3
+
+    def act(self, instr_ptr, memory):
+        arg1 = self.parameters[0] if self.modes[-1] else memory[self.parameters[0]]
+        arg2 = self.parameters[1] if self.modes[-2] else memory[self.parameters[1]]
+        dest = self.parameters[2]
+        if arg1 == arg2:
+            memory[dest] = 1
+        else:
+            memory[dest] = 0
         return instr_ptr + 1 + self.expected_parameters()
 
 class Intcode():
