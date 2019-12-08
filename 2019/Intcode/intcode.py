@@ -2,8 +2,12 @@ import sys
 
 from abc import ABC, abstractmethod
 
+POSITION_MODE = 0
+IMMEDIATE_MODE = 1
+
 class Instruction(ABC):
-    def __init__(self, parameters=[]):
+    def __init__(self, modes=[], parameters=[]):
+        self.modes = modes
         self.parameters = parameters
 
     @abstractmethod
@@ -20,17 +24,32 @@ class Instruction(ABC):
 
     @staticmethod
     def create_instruction(instr_ptr, memory):
-        if memory[instr_ptr] == 99:
+        opcode = memory[instr_ptr]
+        instr_code = opcode % 100
+        modes = list(map(int, str(opcode // 100)))
+        if instr_code == 99:
             new_instr_ptr = instr_ptr + Stop.length()
             return (new_instr_ptr, Stop())
-        elif memory[instr_ptr] == 1:
+        elif instr_code == 1:
             parameter_start = instr_ptr + 1
             new_instr_ptr = instr_ptr + Addition.length()
-            return (new_instr_ptr, Addition(memory[parameter_start : new_instr_ptr]))
-        elif memory[instr_ptr] == 2:
+            while len(modes) < Addition.length() - 1:
+                modes.insert(0, POSITION_MODE)
+            return (new_instr_ptr, Addition(modes, memory[parameter_start : new_instr_ptr]))
+        elif instr_code == 2:
             parameter_start = instr_ptr + 1
             new_instr_ptr = instr_ptr + Multiplication.length()
-            return (new_instr_ptr, Multiplication(memory[parameter_start : new_instr_ptr]))
+            while len(modes) < Multiplication.length() - 1:
+                modes.insert(0, POSITION_MODE)
+            return (new_instr_ptr, Multiplication(modes, memory[parameter_start : new_instr_ptr]))
+        elif instr_code == 3:
+            parameter_start = instr_ptr + 1
+            new_instr_ptr = instr_ptr + Input.length()
+            return (new_instr_ptr, Input([POSITION_MODE], memory[parameter_start : new_instr_ptr]))
+        elif instr_code == 4:
+            parameter_start = instr_ptr + 1
+            new_instr_ptr = instr_ptr + Output.length()
+            return (new_instr_ptr, Output([POSITION_MODE], memory[parameter_start : new_instr_ptr]))
 
 class Stop(Instruction):
     def name(self):
@@ -52,8 +71,8 @@ class Addition(Instruction):
         return 4
 
     def act(self, memory):
-        arg1 = memory[self.parameters[0]]
-        arg2 = memory[self.parameters[1]]
+        arg1 = self.parameters[0] if self.modes[-1] else memory[self.parameters[0]]
+        arg2 = self.parameters[1] if self.modes[-2] else memory[self.parameters[1]]
         memory[self.parameters[2]] = arg1 + arg2
 
 class Multiplication(Instruction):
@@ -65,9 +84,34 @@ class Multiplication(Instruction):
         return 4
 
     def act(self, memory):
-        arg1 = memory[self.parameters[0]]
-        arg2 = memory[self.parameters[1]]
+        arg1 = self.parameters[0] if self.modes[-1] else memory[self.parameters[0]]
+        arg2 = self.parameters[1] if self.modes[-2] else memory[self.parameters[1]]
         memory[self.parameters[2]] = arg1 * arg2
+
+class Input(Instruction):
+    def name(self):
+        return 'Input'
+    
+    @staticmethod
+    def length():
+        return 2
+    
+    def act(self, memory):
+        dest = self.parameters[0]
+        print('Enter value: ')
+        memory[dest] = input()
+
+class Output(Instruction):
+    def name(self):
+        return 'Output'
+
+    @staticmethod
+    def length():
+        return 2
+    
+    def act(self, memory):
+        source = self.parameters[0]
+        print(memory[source])
 
 class Intcode():
 
