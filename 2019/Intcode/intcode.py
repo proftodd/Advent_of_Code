@@ -15,7 +15,7 @@ class Instruction(ABC):
         pass
 
     @abstractmethod
-    def length():
+    def expected_parameters():
         pass
     
     @abstractmethod
@@ -27,28 +27,24 @@ class Instruction(ABC):
         opcode = memory[instr_ptr]
         instr_code = opcode % 100
         modes = list(map(int, str(opcode // 100)))
+        parameter_start = instr_ptr + 1
         if instr_code == 99:
-            new_instr_ptr = instr_ptr + Stop.length()
-            return (new_instr_ptr, Stop())
+            return (parameter_start, Stop())
         elif instr_code == 1:
-            parameter_start = instr_ptr + 1
-            new_instr_ptr = instr_ptr + Addition.length()
-            while len(modes) < Addition.length() - 1:
+            new_instr_ptr = parameter_start + Addition.expected_parameters()
+            while len(modes) < Addition.expected_parameters():
                 modes.insert(0, POSITION_MODE)
             return (new_instr_ptr, Addition(modes, memory[parameter_start : new_instr_ptr]))
         elif instr_code == 2:
-            parameter_start = instr_ptr + 1
-            new_instr_ptr = instr_ptr + Multiplication.length()
-            while len(modes) < Multiplication.length() - 1:
+            new_instr_ptr = parameter_start + Multiplication.expected_parameters()
+            while len(modes) < Multiplication.expected_parameters():
                 modes.insert(0, POSITION_MODE)
             return (new_instr_ptr, Multiplication(modes, memory[parameter_start : new_instr_ptr]))
         elif instr_code == 3:
-            parameter_start = instr_ptr + 1
-            new_instr_ptr = instr_ptr + Input.length()
+            new_instr_ptr = parameter_start + Input.expected_parameters()
             return (new_instr_ptr, Input([POSITION_MODE], memory[parameter_start : new_instr_ptr]))
         elif instr_code == 4:
-            parameter_start = instr_ptr + 1
-            new_instr_ptr = instr_ptr + Output.length()
+            new_instr_ptr = parameter_start + Output.expected_parameters()
             return (new_instr_ptr, Output([POSITION_MODE], memory[parameter_start : new_instr_ptr]))
 
 class Stop(Instruction):
@@ -56,8 +52,8 @@ class Stop(Instruction):
         return 'Stop'
 
     @staticmethod
-    def length():
-        return 1
+    def expected_parameters():
+        return 0
 
     def act(self, memory):
         pass
@@ -67,8 +63,8 @@ class Addition(Instruction):
         return 'Addition'
 
     @staticmethod
-    def length():
-        return 4
+    def expected_parameters():
+        return 3
 
     def act(self, memory):
         arg1 = self.parameters[0] if self.modes[-1] else memory[self.parameters[0]]
@@ -80,8 +76,8 @@ class Multiplication(Instruction):
         return 'Multiplication'
 
     @staticmethod
-    def length():
-        return 4
+    def expected_parameters():
+        return 3
 
     def act(self, memory):
         arg1 = self.parameters[0] if self.modes[-1] else memory[self.parameters[0]]
@@ -93,21 +89,21 @@ class Input(Instruction):
         return 'Input'
     
     @staticmethod
-    def length():
-        return 2
+    def expected_parameters():
+        return 1
     
     def act(self, memory):
         dest = self.parameters[0]
         print('Enter value: ')
-        memory[dest] = input()
+        memory[dest] = int(input().strip())
 
 class Output(Instruction):
     def name(self):
         return 'Output'
 
     @staticmethod
-    def length():
-        return 2
+    def expected_parameters():
+        return 1
     
     def act(self, memory):
         source = self.parameters[0]
