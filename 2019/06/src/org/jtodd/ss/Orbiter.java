@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 public class Orbiter {
 
     private String name;
+    private Orbiter parent;
     private List<Orbiter> satellites;
 
     public Orbiter(String name) {
@@ -14,7 +15,19 @@ public class Orbiter {
         satellites = new ArrayList<>();
     }
 
-    public void addOrbiter(Orbiter o) {
+    public String getName() {
+        return name;
+    }
+
+    public Orbiter getParent() {
+        return parent;
+    }
+
+    public void setParent(Orbiter parent) {
+        this.parent = parent;
+    }
+
+    public void addSatellite(Orbiter o) {
         satellites.add(o);
     }
 
