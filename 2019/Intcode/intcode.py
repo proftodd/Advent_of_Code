@@ -44,10 +44,10 @@ class Instruction(ABC):
             parameter_end = parameter_start + Output.expected_parameters()
             return Output([POSITION_MODE], memory[parameter_start : parameter_end])
         elif instr_code == 5:
-            parameter_end = parameter_start + JumpIfTrue.expected_parameters()
-            while len(modes) < JumpIfTrue.expected_parameters():
+            parameter_end = parameter_start + JumpIfFalse.expected_parameters()
+            while len(modes) < JumpIfFalse.expected_parameters():
                 modes.insert(0, POSITION_MODE)
-            return JumpIfTrue(modes, memory[parameter_start : parameter_end])
+            return JumpIfFalse(modes, memory[parameter_start : parameter_end])
         elif instr_code == 6:
             parameter_end = parameter_start + JumpIfFalse.expected_parameters()
             while len(modes) < JumpIfFalse.expected_parameters():
@@ -194,6 +194,9 @@ class Intcode():
         line = fp.readline().strip()
         fp.close()
         self.memory = list(map(int, line.split(',')))
+    
+    def load_memory(self, memory):
+        self.memory = memory
 
     def run_program(self):
         self.instr_ptr = 0
