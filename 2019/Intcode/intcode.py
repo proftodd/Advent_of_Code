@@ -7,7 +7,8 @@ IMMEDIATE_MODE = 1
 
 class Instruction(ABC):
 
-    def __init__(self, modes=[], parameters=[]):
+    def __init__(self, computer, modes=[], parameters=[]):
+        self.computer = computer
         self.modes = modes
         self.parameters = parameters
 
@@ -20,49 +21,49 @@ class Instruction(ABC):
         pass
 
     @staticmethod
-    def create_instruction(instr_ptr, memory):
+    def create_instruction(ss, instr_ptr, memory):
         opcode = memory[instr_ptr]
         instr_code = opcode % 100
         modes = list(map(int, str(opcode // 100)))
         parameter_start = instr_ptr + 1
         if instr_code == 99:
-            return Stop()
+            return Stop(ss)
         elif instr_code == 1:
             parameter_end = parameter_start + Addition.expected_parameters()
             while len(modes) < Addition.expected_parameters():
                 modes.insert(0, POSITION_MODE)
-            return Addition(modes, memory[parameter_start : parameter_end])
+            return Addition(ss, modes, memory[parameter_start : parameter_end])
         elif instr_code == 2:
             parameter_end = parameter_start + Multiplication.expected_parameters()
             while len(modes) < Multiplication.expected_parameters():
                 modes.insert(0, POSITION_MODE)
-            return Multiplication(modes, memory[parameter_start : parameter_end])
+            return Multiplication(ss, modes, memory[parameter_start : parameter_end])
         elif instr_code == 3:
             parameter_end = parameter_start + Input.expected_parameters()
-            return Input([POSITION_MODE], memory[parameter_start : parameter_end])
+            return Input(ss, [POSITION_MODE], memory[parameter_start : parameter_end])
         elif instr_code == 4:
             parameter_end = parameter_start + Output.expected_parameters()
-            return Output([POSITION_MODE], memory[parameter_start : parameter_end])
+            return Output(ss, [POSITION_MODE], memory[parameter_start : parameter_end])
         elif instr_code == 5:
-            parameter_end = parameter_start + JumpIfFalse.expected_parameters()
-            while len(modes) < JumpIfFalse.expected_parameters():
+            parameter_end = parameter_start + JumpIfTrue.expected_parameters()
+            while len(modes) < JumpIfTrue.expected_parameters():
                 modes.insert(0, POSITION_MODE)
-            return JumpIfFalse(modes, memory[parameter_start : parameter_end])
+            return JumpIfTrue(ss, modes, memory[parameter_start : parameter_end])
         elif instr_code == 6:
             parameter_end = parameter_start + JumpIfFalse.expected_parameters()
             while len(modes) < JumpIfFalse.expected_parameters():
                 modes.insert(0, POSITION_MODE)
-            return JumpIfFalse(modes, memory[parameter_start : parameter_end])
+            return JumpIfFalse(ss, modes, memory[parameter_start : parameter_end])
         elif instr_code == 7:
             parameter_end = parameter_start + LessThan.expected_parameters()
             while len(modes) < LessThan.expected_parameters():
                 modes.insert(0, POSITION_MODE)
-            return LessThan(modes, memory[parameter_start : parameter_end])
+            return LessThan(ss, modes, memory[parameter_start : parameter_end])
         elif instr_code == 8:
             parameter_end = parameter_start + Equals.expected_parameters()
             while len(modes) < Equals.expected_parameters():
                 modes.insert(0, POSITION_MODE)
-            return Equals(modes, memory[parameter_start : parameter_end])
+            return Equals(ss, modes, memory[parameter_start : parameter_end])
 
 class Stop(Instruction):
 
@@ -108,8 +109,12 @@ class Input(Instruction):
     
     def act(self, instr_ptr, memory):
         dest = self.parameters[0]
-        print('Enter value: ')
-        memory[dest] = int(input().strip())
+        if self.computer.input_device == None:
+            print('Enter value: ')
+            value = input()
+        else:
+            value = self.computer.input_device.pop(0)
+        memory[dest] = int(value.strip())
         return instr_ptr + 1 + self.expected_parameters()
 
 
@@ -121,7 +126,11 @@ class Output(Instruction):
     
     def act(self, instr_ptr, memory):
         source = self.parameters[0]
-        print(memory[source])
+        value = memory[source]
+        if self.computer.output_device == None:
+            print(value)
+        else:
+            self.computer.output_device.append(value)
         return instr_ptr + 1 + self.expected_parameters()
 
 class JumpIfTrue(Instruction):
@@ -186,8 +195,10 @@ class Equals(Instruction):
 
 class Intcode():
 
-    def __init__(self):
+    def __init__(self, input_device=None, output_device=None):
         self.memory = []
+        self.input_device = input_device
+        self.output_device = output_device
 
     def read_memory(self, filename):
         fp = open(filename, 'r')
@@ -201,7 +212,7 @@ class Intcode():
     def run_program(self):
         self.instr_ptr = 0
         while self.instr_ptr >= 0:
-            current_instr = Instruction.create_instruction(self.instr_ptr, self.memory)
+            current_instr = Instruction.create_instruction(self, self.instr_ptr, self.memory)
             self.instr_ptr = current_instr.act(self.instr_ptr, self.memory)
 
     def write_memory(self):
