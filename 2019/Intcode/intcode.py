@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 POSITION_MODE = 0
 IMMEDIATE_MODE = 1
 
+
 class Instruction(ABC):
 
     def __init__(self, computer, modes=[], parameters=[]):
@@ -67,6 +68,7 @@ class Instruction(ABC):
                 modes.insert(0, POSITION_MODE)
             return Equals(ss, modes, memory[parameter_start : parameter_end])
 
+
 class Stop(Instruction):
 
     @staticmethod
@@ -75,6 +77,7 @@ class Stop(Instruction):
 
     def act(self, instr_ptr, memory):
         return -1
+
 
 class Addition(Instruction):
 
@@ -91,6 +94,7 @@ class Addition(Instruction):
         memory[self.parameters[2]] = arg1 + arg2
         return instr_ptr + 1 + self.expected_parameters()
 
+
 class Multiplication(Instruction):
 
     @staticmethod
@@ -103,6 +107,7 @@ class Multiplication(Instruction):
         memory[self.parameters[2]] = arg1 * arg2
         return instr_ptr + 1 + self.expected_parameters()
 
+
 class Input(Instruction):
 
     @staticmethod
@@ -111,7 +116,7 @@ class Input(Instruction):
     
     def act(self, instr_ptr, memory):
         dest = self.parameters[0]
-        if self.computer.input_device == None:
+        if self.computer.input_device is None:
             print('Enter value: ')
             value = input()
         else:
@@ -134,6 +139,7 @@ class Output(Instruction):
             self.computer.output_device.append(value)
         return instr_ptr + 1 + self.expected_parameters()
 
+
 class JumpIfTrue(Instruction):
 
     @staticmethod
@@ -148,6 +154,7 @@ class JumpIfTrue(Instruction):
         else:
             return instr_ptr + 1 + self.expected_parameters()
 
+
 class JumpIfFalse(Instruction):
 
     @staticmethod
@@ -161,6 +168,7 @@ class JumpIfFalse(Instruction):
             return instr_ptr + 1 + self.expected_parameters()
         else:
             return destination
+
 
 class LessThan(Instruction):
 
@@ -178,6 +186,7 @@ class LessThan(Instruction):
             memory[dest] = 0
         return instr_ptr + 1 + self.expected_parameters()
 
+
 class Equals(Instruction):
 
     @staticmethod
@@ -193,6 +202,7 @@ class Equals(Instruction):
         else:
             memory[dest] = 0
         return instr_ptr + 1 + self.expected_parameters()
+
 
 class Intcode():
 
@@ -219,6 +229,7 @@ class Intcode():
     def write_memory(self):
         print(','.join([str(i) for i in self.memory]))
 
+
 def main():
     intcode = Intcode()
     input_file = sys.argv[1]
@@ -229,6 +240,7 @@ def main():
     intcode.run_program()
     print(f"Writing results to stdout")
     intcode.write_memory()
+
 
 if __name__ == '__main__':
     main()
