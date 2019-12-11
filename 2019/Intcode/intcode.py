@@ -13,6 +13,7 @@ class Instruction(ABC):
         self.modes = modes
         self.parameters = parameters
 
+    @staticmethod
     @abstractmethod
     def expected_parameters():
         pass
@@ -33,40 +34,40 @@ class Instruction(ABC):
             parameter_end = parameter_start + Addition.expected_parameters()
             while len(modes) < Addition.expected_parameters():
                 modes.insert(0, POSITION_MODE)
-            return Addition(ss, modes, memory[parameter_start : parameter_end])
+            return Addition(ss, modes, memory[parameter_start:parameter_end])
         elif instr_code == 2:
             parameter_end = parameter_start + Multiplication.expected_parameters()
             while len(modes) < Multiplication.expected_parameters():
                 modes.insert(0, POSITION_MODE)
-            return Multiplication(ss, modes, memory[parameter_start : parameter_end])
+            return Multiplication(ss, modes, memory[parameter_start:parameter_end])
         elif instr_code == 3:
             parameter_end = parameter_start + Input.expected_parameters()
-            return Input(ss, [POSITION_MODE], memory[parameter_start : parameter_end])
+            return Input(ss, [POSITION_MODE], memory[parameter_start:parameter_end])
         elif instr_code == 4:
             parameter_end = parameter_start + Output.expected_parameters()
             while len(modes) < Output.expected_parameters():
                 modes.insert(0, POSITION_MODE)
-            return Output(ss, modes, memory[parameter_start : parameter_end])
+            return Output(ss, modes, memory[parameter_start:parameter_end])
         elif instr_code == 5:
             parameter_end = parameter_start + JumpIfTrue.expected_parameters()
             while len(modes) < JumpIfTrue.expected_parameters():
                 modes.insert(0, POSITION_MODE)
-            return JumpIfTrue(ss, modes, memory[parameter_start : parameter_end])
+            return JumpIfTrue(ss, modes, memory[parameter_start:parameter_end])
         elif instr_code == 6:
             parameter_end = parameter_start + JumpIfFalse.expected_parameters()
             while len(modes) < JumpIfFalse.expected_parameters():
                 modes.insert(0, POSITION_MODE)
-            return JumpIfFalse(ss, modes, memory[parameter_start : parameter_end])
+            return JumpIfFalse(ss, modes, memory[parameter_start:parameter_end])
         elif instr_code == 7:
             parameter_end = parameter_start + LessThan.expected_parameters()
             while len(modes) < LessThan.expected_parameters():
                 modes.insert(0, POSITION_MODE)
-            return LessThan(ss, modes, memory[parameter_start : parameter_end])
+            return LessThan(ss, modes, memory[parameter_start:parameter_end])
         elif instr_code == 8:
             parameter_end = parameter_start + Equals.expected_parameters()
             while len(modes) < Equals.expected_parameters():
                 modes.insert(0, POSITION_MODE)
-            return Equals(ss, modes, memory[parameter_start : parameter_end])
+            return Equals(ss, modes, memory[parameter_start:parameter_end])
 
 
 class Stop(Instruction):
@@ -80,9 +81,6 @@ class Stop(Instruction):
 
 
 class Addition(Instruction):
-
-    def name(self):
-        return 'Addition'
 
     @staticmethod
     def expected_parameters():
@@ -204,7 +202,7 @@ class Equals(Instruction):
         return instr_ptr + 1 + self.expected_parameters()
 
 
-class Intcode():
+class Intcode:
 
     def __init__(self, input_device=None, output_device=None):
         self.memory = []
