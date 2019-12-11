@@ -43,7 +43,9 @@ class Instruction(ABC):
             return Input(ss, [POSITION_MODE], memory[parameter_start : parameter_end])
         elif instr_code == 4:
             parameter_end = parameter_start + Output.expected_parameters()
-            return Output(ss, [POSITION_MODE], memory[parameter_start : parameter_end])
+            while len(modes) < Output.expected_parameters():
+                modes.insert(0, POSITION_MODE)
+            return Output(ss, modes, memory[parameter_start : parameter_end])
         elif instr_code == 5:
             parameter_end = parameter_start + JumpIfTrue.expected_parameters()
             while len(modes) < JumpIfTrue.expected_parameters():
@@ -125,9 +127,8 @@ class Output(Instruction):
         return 1
     
     def act(self, instr_ptr, memory):
-        source = self.parameters[0]
-        value = memory[source]
-        if self.computer.output_device == None:
+        value = self.parameters[0] if self.modes[-1] else memory[self.parameters[0]]
+        if self.computer.output_device is None:
             print(value)
         else:
             self.computer.output_device.append(value)

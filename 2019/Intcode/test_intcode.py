@@ -63,7 +63,7 @@ def test_input():
 def test_output():
     output_buffer = []
     ss = Intcode(output_device=output_buffer)
-    output_instruction = Output(ss, [], [0])
+    output_instruction = Output(ss, [0], [0])
     memory = [69]
     new_ptr = output_instruction.act(0, memory)
     assert new_ptr == 2
@@ -351,6 +351,7 @@ def test_day_5_example_07():
     assert memory == [3, 3, 1105, 0, 9, 1101, 0, 0, 12, 4, 12, 99, 0]
     assert output_buffer_2 == [0]
 
+
 def test_day_5_example_08():
     original_memory = [3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20, 1006, 20, 31, 1106, 0, 36, 98, 0, 0, 1002, 21, 125, 20, 4, 20, 1105, 1, 46, 104, 999, 1105, 1, 46, 1101, 1000, 1, 20, 4, 20, 1105, 1, 46, 98, 99]
     input_buffer_1 = ['7']
@@ -359,18 +360,18 @@ def test_day_5_example_08():
     memory = list(original_memory)
     ss_1.load_memory(memory)
     ss_1.run_program()
-    assert output_buffer_1 == [998]
-    # input_buffer_2 = ['8']
-    # output_buffer_2 = []
-    # ss_2 = Intcode(input_device=input_buffer_2, output_device=output_buffer_2)
-    # memory = list(original_memory)
-    # ss_2.load_memory(memory)
-    # ss_2.run_program()
-    # assert output_buffer_2 == [1000]
-    # input_buffer_3 = ['9']
-    # output_buffer_3 = []
-    # ss_3 = Intcode(input_device=input_buffer_3, output_device=output_buffer_3)
-    # memory = list(original_memory)
-    # ss_3.load_memory(memory)
-    # ss_3.run_program()
-    # assert output_buffer_3 == [1001]
+    assert output_buffer_1 == [999]
+    input_buffer_2 = ['8']
+    output_buffer_2 = []
+    ss_2 = Intcode(input_device=input_buffer_2, output_device=output_buffer_2)
+    memory = list(original_memory)
+    ss_2.load_memory(memory)
+    ss_2.run_program()
+    assert output_buffer_2 == [1000]
+    input_buffer_3 = ['9']
+    output_buffer_3 = []
+    ss_3 = Intcode(input_device=input_buffer_3, output_device=output_buffer_3)
+    memory = list(original_memory)
+    ss_3.load_memory(memory)
+    ss_3.run_program()
+    assert output_buffer_3 == [1001]
