@@ -8,10 +8,18 @@ IMMEDIATE_MODE = 1
 
 class Instruction(ABC):
 
-    def __init__(self, computer, modes=[], parameters=[]):
+    def __init__(self, computer, instr_ptr, memory):
         self.computer = computer
+        self.instr_ptr = instr_ptr
+        self.memory = memory
+        opcode = memory[instr_ptr]
+        modes = list(map(int, str(opcode // 100)))
+        while len(modes) < self.expected_parameters():
+            modes.insert(0, POSITION_MODE)
         self.modes = modes
-        self.parameters = parameters
+        parameter_start = instr_ptr + 1
+        parameter_end = parameter_start + self.expected_parameters()
+        self.parameters = memory[parameter_start:parameter_end]
 
     @staticmethod
     @abstractmethod
@@ -19,187 +27,190 @@ class Instruction(ABC):
         pass
     
     @abstractmethod
-    def act(self, instr_ptr, memory):
+    def act(self):
         pass
 
     @staticmethod
     def create_instruction(ss, instr_ptr, memory):
         opcode = memory[instr_ptr]
         instr_code = opcode % 100
-        modes = list(map(int, str(opcode // 100)))
-        parameter_start = instr_ptr + 1
         if instr_code == 99:
-            return Stop(ss)
+            return Stop(ss, instr_ptr, memory)
         elif instr_code == 1:
-            parameter_end = parameter_start + Addition.expected_parameters()
-            while len(modes) < Addition.expected_parameters():
-                modes.insert(0, POSITION_MODE)
-            return Addition(ss, modes, memory[parameter_start:parameter_end])
+            return Addition(ss, instr_ptr, memory)
         elif instr_code == 2:
-            parameter_end = parameter_start + Multiplication.expected_parameters()
-            while len(modes) < Multiplication.expected_parameters():
-                modes.insert(0, POSITION_MODE)
-            return Multiplication(ss, modes, memory[parameter_start:parameter_end])
+            return Multiplication(ss, instr_ptr, memory)
         elif instr_code == 3:
-            parameter_end = parameter_start + Input.expected_parameters()
-            return Input(ss, [POSITION_MODE], memory[parameter_start:parameter_end])
+            return Input(ss, instr_ptr, memory)
         elif instr_code == 4:
-            parameter_end = parameter_start + Output.expected_parameters()
-            while len(modes) < Output.expected_parameters():
-                modes.insert(0, POSITION_MODE)
-            return Output(ss, modes, memory[parameter_start:parameter_end])
+            return Output(ss, instr_ptr, memory)
         elif instr_code == 5:
-            parameter_end = parameter_start + JumpIfTrue.expected_parameters()
-            while len(modes) < JumpIfTrue.expected_parameters():
-                modes.insert(0, POSITION_MODE)
-            return JumpIfTrue(ss, modes, memory[parameter_start:parameter_end])
+            return JumpIfTrue(ss, instr_ptr, memory)
         elif instr_code == 6:
-            parameter_end = parameter_start + JumpIfFalse.expected_parameters()
-            while len(modes) < JumpIfFalse.expected_parameters():
-                modes.insert(0, POSITION_MODE)
-            return JumpIfFalse(ss, modes, memory[parameter_start:parameter_end])
+            return JumpIfFalse(ss, instr_ptr, memory)
         elif instr_code == 7:
-            parameter_end = parameter_start + LessThan.expected_parameters()
-            while len(modes) < LessThan.expected_parameters():
-                modes.insert(0, POSITION_MODE)
-            return LessThan(ss, modes, memory[parameter_start:parameter_end])
+            return LessThan(ss, instr_ptr, memory)
         elif instr_code == 8:
-            parameter_end = parameter_start + Equals.expected_parameters()
-            while len(modes) < Equals.expected_parameters():
-                modes.insert(0, POSITION_MODE)
-            return Equals(ss, modes, memory[parameter_start:parameter_end])
+            return Equals(ss, instr_ptr, memory)
 
 
 class Stop(Instruction):
+
+    def __init__(self, ss, instr_ptr, memory):
+        super(Stop, self).__init__(ss, instr_ptr, memory)
 
     @staticmethod
     def expected_parameters():
         return 0
 
-    def act(self, instr_ptr, memory):
+    def act(self):
         return -1
 
 
 class Addition(Instruction):
 
+    def __init__(self, ss, instr_ptr, memory):
+        super(Addition, self).__init__(ss, instr_ptr, memory)
+
     @staticmethod
     def expected_parameters():
         return 3
 
-    def act(self, instr_ptr, memory):
-        arg1 = self.parameters[0] if self.modes[-1] else memory[self.parameters[0]]
-        arg2 = self.parameters[1] if self.modes[-2] else memory[self.parameters[1]]
-        memory[self.parameters[2]] = arg1 + arg2
-        return instr_ptr + 1 + self.expected_parameters()
+    def act(self):
+        arg1 = self.parameters[0] if self.modes[-1] else self.memory[self.parameters[0]]
+        arg2 = self.parameters[1] if self.modes[-2] else self.memory[self.parameters[1]]
+        self.memory[self.parameters[2]] = arg1 + arg2
+        return self.instr_ptr + 1 + self.expected_parameters()
 
 
 class Multiplication(Instruction):
 
+    def __init__(self, ss, instr_ptr, memory):
+        super(Multiplication, self).__init__(ss, instr_ptr, memory)
+
     @staticmethod
     def expected_parameters():
         return 3
 
-    def act(self, instr_ptr, memory):
-        arg1 = self.parameters[0] if self.modes[-1] else memory[self.parameters[0]]
-        arg2 = self.parameters[1] if self.modes[-2] else memory[self.parameters[1]]
-        memory[self.parameters[2]] = arg1 * arg2
-        return instr_ptr + 1 + self.expected_parameters()
+    def act(self):
+        arg1 = self.parameters[0] if self.modes[-1] else self.memory[self.parameters[0]]
+        arg2 = self.parameters[1] if self.modes[-2] else self.memory[self.parameters[1]]
+        self.memory[self.parameters[2]] = arg1 * arg2
+        return self.instr_ptr + 1 + self.expected_parameters()
 
 
 class Input(Instruction):
+
+    def __init__(self, ss, instr_ptr, memory):
+        super(Input, self).__init__(ss, instr_ptr, memory)
 
     @staticmethod
     def expected_parameters():
         return 1
     
-    def act(self, instr_ptr, memory):
+    def act(self):
         dest = self.parameters[0]
         if self.computer.input_device is None:
             print('Enter value: ')
             value = input()
         else:
             value = self.computer.input_device.pop(0)
-        memory[dest] = int(value.strip())
-        return instr_ptr + 1 + self.expected_parameters()
+        self.memory[dest] = int(value.strip())
+        return self.instr_ptr + 1 + self.expected_parameters()
 
 
 class Output(Instruction):
+
+    def __init__(self, ss, instr_ptr, memory):
+        super(Output, self).__init__(ss, instr_ptr, memory)
 
     @staticmethod
     def expected_parameters():
         return 1
     
-    def act(self, instr_ptr, memory):
-        value = self.parameters[0] if self.modes[-1] else memory[self.parameters[0]]
+    def act(self):
+        value = self.parameters[0] if self.modes[-1] else self.memory[self.parameters[0]]
         if self.computer.output_device is None:
             print(value)
         else:
             self.computer.output_device.append(value)
-        return instr_ptr + 1 + self.expected_parameters()
+        return self.instr_ptr + 1 + self.expected_parameters()
 
 
 class JumpIfTrue(Instruction):
 
+    def __init__(self, ss, instr_ptr, memory):
+        super(JumpIfTrue, self).__init__(ss, instr_ptr, memory)
+
     @staticmethod
     def expected_parameters():
         return 2
 
-    def act(self, instr_ptr, memory):
-        condition =   self.parameters[0] if self.modes[-1] else memory[self.parameters[0]]
-        destination = self.parameters[1] if self.modes[-2] else memory[self.parameters[1]]
+    def act(self):
+        condition =   self.parameters[0] if self.modes[-1] else self.memory[self.parameters[0]]
+        destination = self.parameters[1] if self.modes[-2] else self.memory[self.parameters[1]]
         if condition:
             return destination
         else:
-            return instr_ptr + 1 + self.expected_parameters()
+            return self.instr_ptr + 1 + self.expected_parameters()
 
 
 class JumpIfFalse(Instruction):
 
+    def __init__(self, ss, instr_ptr, memory):
+        super(JumpIfFalse, self).__init__(ss, instr_ptr, memory)
+
     @staticmethod
     def expected_parameters():
         return 2
 
-    def act(self, instr_ptr, memory):
-        condition =   self.parameters[0] if self.modes[-1] else memory[self.parameters[0]]
-        destination = self.parameters[1] if self.modes[-2] else memory[self.parameters[1]]
+    def act(self):
+        condition =   self.parameters[0] if self.modes[-1] else self.memory[self.parameters[0]]
+        destination = self.parameters[1] if self.modes[-2] else self.memory[self.parameters[1]]
         if condition:
-            return instr_ptr + 1 + self.expected_parameters()
+            return self.instr_ptr + 1 + self.expected_parameters()
         else:
             return destination
 
 
 class LessThan(Instruction):
 
+    def __init__(self, ss, instr_ptr, memory):
+        super(LessThan, self).__init__(ss, instr_ptr, memory)
+
     @staticmethod
     def expected_parameters():
         return 3
     
-    def act(self, instr_ptr, memory):
-        arg1 = self.parameters[0] if self.modes[-1] else memory[self.parameters[0]]
-        arg2 = self.parameters[1] if self.modes[-2] else memory[self.parameters[1]]
+    def act(self):
+        arg1 = self.parameters[0] if self.modes[-1] else self.memory[self.parameters[0]]
+        arg2 = self.parameters[1] if self.modes[-2] else self.memory[self.parameters[1]]
         dest = self.parameters[2]
         if arg1 < arg2:
-            memory[dest] = 1
+            self.memory[dest] = 1
         else:
-            memory[dest] = 0
-        return instr_ptr + 1 + self.expected_parameters()
+            self.memory[dest] = 0
+        return self.instr_ptr + 1 + self.expected_parameters()
 
 
 class Equals(Instruction):
+
+    def __init__(self, ss, instr_ptr, memory):
+        super(Equals, self).__init__(ss, instr_ptr, memory)
 
     @staticmethod
     def expected_parameters():
         return 3
 
-    def act(self, instr_ptr, memory):
-        arg1 = self.parameters[0] if self.modes[-1] else memory[self.parameters[0]]
-        arg2 = self.parameters[1] if self.modes[-2] else memory[self.parameters[1]]
+    def act(self):
+        arg1 = self.parameters[0] if self.modes[-1] else self.memory[self.parameters[0]]
+        arg2 = self.parameters[1] if self.modes[-2] else self.memory[self.parameters[1]]
         dest = self.parameters[2]
         if arg1 == arg2:
-            memory[dest] = 1
+            self.memory[dest] = 1
         else:
-            memory[dest] = 0
-        return instr_ptr + 1 + self.expected_parameters()
+            self.memory[dest] = 0
+        return self.instr_ptr + 1 + self.expected_parameters()
 
 
 class Intcode:
@@ -219,10 +230,10 @@ class Intcode:
         self.memory = memory
 
     def run_program(self):
-        self.instr_ptr = 0
-        while self.instr_ptr >= 0:
-            current_instr = Instruction.create_instruction(self, self.instr_ptr, self.memory)
-            self.instr_ptr = current_instr.act(self.instr_ptr, self.memory)
+        instr_ptr = 0
+        while instr_ptr >= 0:
+            current_instr = Instruction.create_instruction(self, instr_ptr, self.memory)
+            instr_ptr = current_instr.act()
 
     def write_memory(self):
         print(','.join([str(i) for i in self.memory]))
