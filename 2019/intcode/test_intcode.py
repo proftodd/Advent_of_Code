@@ -213,16 +213,14 @@ def test_day_03_example_04():
 
 
 def test_day_04_input():
-    ss.read_memory('../02/input.txt')
+    program = Intcode.read_memory('../02/input.txt')
+    ss.load_memory(program)
     ss.run_program()
     assert ss.memory[0] == 394702
 
 
 def test_day_04_corrected_input():
-    fp = open('../02/input.txt')
-    line = fp.readline().strip()
-    fp.close()
-    memory = list(map(int, line.split(',')))
+    memory = Intcode.read_memory('../02/input.txt')
     memory[1] = 12
     memory[2] = 2
     ss.load_memory(memory)
@@ -231,10 +229,7 @@ def test_day_04_corrected_input():
 
 
 def test_day_04_part_2():
-    fp = open('../02/input.txt')
-    line = fp.readline().strip()
-    fp.close()
-    memory = list(map(int, line.split(',')))
+    memory = Intcode.read_memory('../02/input.txt')
     memory[1] = 67
     memory[2] = 18
     ss.load_memory(memory)

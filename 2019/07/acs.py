@@ -8,7 +8,7 @@ def try_permutation(program, perm):
         input_buffer = [i, value]
         output_buffer = []
         ss = intcode.intcode.Intcode(input_device=input_buffer, output_device=output_buffer)
-        ss.read_memory(program)
+        ss.load_memory(program)
         ss.run_program()
         value = output_buffer[0]
     return value
@@ -25,7 +25,7 @@ def maximize_thrust(program, settings):
     return max_thrust, best_settings
 
 def main():
-    program = sys.argv[1]
+    program = intcode.intcode.Intcode.read_memory(sys.argv[1])
     settings = [0, 1, 2, 3, 4]
     max_thrust, best_settings = maximize_thrust(program, settings)
     print(f"maximum thrust of {max_thrust} achieved with {best_settings}")

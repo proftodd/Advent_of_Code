@@ -229,12 +229,13 @@ class Intcode:
         self.input_device = input_device
         self.output_device = output_device
 
-    def read_memory(self, filename):
+    @staticmethod
+    def read_memory(filename):
         fp = open(filename, 'r')
         line = fp.readline().strip()
         fp.close()
-        self.memory = list(map(int, line.split(',')))
-    
+        return list(map(int, line.split(',')))
+
     def load_memory(self, memory):
         self.memory = memory
 
