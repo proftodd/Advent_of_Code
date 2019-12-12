@@ -1,27 +1,34 @@
+import itertools
 import sys
 import intcode.intcode
 
-def main():
-    settings = [0, 1, 2, 3, 4]
-    program = sys.argv[1]
-    input_buffers = [
-        [settings[1]],
-        [settings[0]],
-        [settings[4]],
-        [settings[3]],
-        [settings[2]]
-    ]
-    output_buffers = [[], [], [], [], []]
-    ss = []
+def try_permutation(program, perm):
     value = 0
-    for i in range(5):
-        ss.append(intcode.intcode.Intcode(input_device=input_buffers[i], output_device=output_buffers[i]))
-        ss[i].read_memory(program)
-        input_buffers[i].append(value)
-        ss[i].run_program()
-        value = str(output_buffers[i][0])
-    print(output_buffers[4][0])
+    for i in perm:
+        input_buffer = [i, value]
+        output_buffer = []
+        ss = intcode.intcode.Intcode(input_device=input_buffer, output_device=output_buffer)
+        ss.read_memory(program)
+        ss.run_program()
+        value = output_buffer[0]
+    return value
 
+
+def maximize_thrust(program, settings):
+    max_thrust = 0
+    best_settings = None
+    for perm in itertools.permutations(settings):
+        this_thrust = try_permutation(program, perm)
+        if this_thrust > max_thrust:
+            best_settings = perm
+            max_thrust = this_thrust
+    return max_thrust, best_settings
+
+def main():
+    program = sys.argv[1]
+    settings = [0, 1, 2, 3, 4]
+    max_thrust, best_settings = maximize_thrust(program, settings)
+    print(f"maximum thrust of {max_thrust} achieved with {best_settings}")
 
 if __name__ == '__main__':
     main()
