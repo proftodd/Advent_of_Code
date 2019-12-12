@@ -121,7 +121,10 @@ class Input(Instruction):
             value = input()
         else:
             value = self.computer.input_device.pop(0)
-        self.memory[dest] = int(value.strip())
+        if type(value) is str:
+            self.memory[dest] = int(value.strip())
+        else:
+            self.memory[dest] = value
         return self.advance_pointer()
 
 

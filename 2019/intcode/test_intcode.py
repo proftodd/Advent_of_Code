@@ -1,4 +1,4 @@
-from intcode import (
+from intcode.intcode import (
     Stop,
     Addition,
     Multiplication,
