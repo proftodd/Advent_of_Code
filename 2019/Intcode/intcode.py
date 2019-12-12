@@ -33,6 +33,9 @@ class Instruction(ABC):
     def act(self):
         pass
 
+    def advance_pointer(self):
+        return self.instr_ptr + 1 + self.expected_parameters()
+
     @staticmethod
     def create_instruction(ss, instr_ptr, memory):
         opcode = memory[instr_ptr]
@@ -83,7 +86,7 @@ class Addition(Instruction):
         arg1 = self.get_parameter(0)
         arg2 = self.get_parameter(1)
         self.memory[self.parameters[2]] = arg1 + arg2
-        return self.instr_ptr + 1 + self.expected_parameters()
+        return self.advance_pointer()
 
 
 class Multiplication(Instruction):
@@ -99,7 +102,7 @@ class Multiplication(Instruction):
         arg1 = self.get_parameter(0)
         arg2 = self.get_parameter(1)
         self.memory[self.parameters[2]] = arg1 * arg2
-        return self.instr_ptr + 1 + self.expected_parameters()
+        return self.advance_pointer()
 
 
 class Input(Instruction):
@@ -119,7 +122,7 @@ class Input(Instruction):
         else:
             value = self.computer.input_device.pop(0)
         self.memory[dest] = int(value.strip())
-        return self.instr_ptr + 1 + self.expected_parameters()
+        return self.advance_pointer()
 
 
 class Output(Instruction):
@@ -137,7 +140,7 @@ class Output(Instruction):
             print(value)
         else:
             self.computer.output_device.append(value)
-        return self.instr_ptr + 1 + self.expected_parameters()
+        return self.advance_pointer()
 
 
 class JumpIfTrue(Instruction):
@@ -155,7 +158,7 @@ class JumpIfTrue(Instruction):
         if condition:
             return destination
         else:
-            return self.instr_ptr + 1 + self.expected_parameters()
+            return self.advance_pointer()
 
 
 class JumpIfFalse(Instruction):
@@ -171,7 +174,7 @@ class JumpIfFalse(Instruction):
         condition =   self.get_parameter(0)
         destination = self.get_parameter(1)
         if condition:
-            return self.instr_ptr + 1 + self.expected_parameters()
+            return self.advance_pointer()
         else:
             return destination
 
@@ -193,7 +196,7 @@ class LessThan(Instruction):
             self.memory[dest] = 1
         else:
             self.memory[dest] = 0
-        return self.instr_ptr + 1 + self.expected_parameters()
+        return self.advance_pointer()
 
 
 class Equals(Instruction):
@@ -213,7 +216,7 @@ class Equals(Instruction):
             self.memory[dest] = 1
         else:
             self.memory[dest] = 0
-        return self.instr_ptr + 1 + self.expected_parameters()
+        return self.advance_pointer()
 
 
 class Intcode:

@@ -108,7 +108,7 @@ def test_jump_if_false_position():
     will_jump = JumpIfFalse(ss, 0, memory)
     new_ptr = will_jump.act()
     assert new_ptr == 2
-    memory = [5, 3, 2, 1]
+    memory = [6, 3, 2, 1]
     wont_jump = JumpIfFalse(ss, 0, memory)
     new_ptr = wont_jump.act()
     assert new_ptr == 3
