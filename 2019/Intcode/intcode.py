@@ -25,6 +25,9 @@ class Instruction(ABC):
     @abstractmethod
     def expected_parameters():
         pass
+
+    def get_parameter(self, index):
+        return self.parameters[index] if self.modes[-1 * (index + 1)] else self.memory[self.parameters[index]]
     
     @abstractmethod
     def act(self):
@@ -77,8 +80,8 @@ class Addition(Instruction):
         return 3
 
     def act(self):
-        arg1 = self.parameters[0] if self.modes[-1] else self.memory[self.parameters[0]]
-        arg2 = self.parameters[1] if self.modes[-2] else self.memory[self.parameters[1]]
+        arg1 = self.get_parameter(0)
+        arg2 = self.get_parameter(1)
         self.memory[self.parameters[2]] = arg1 + arg2
         return self.instr_ptr + 1 + self.expected_parameters()
 
@@ -93,8 +96,8 @@ class Multiplication(Instruction):
         return 3
 
     def act(self):
-        arg1 = self.parameters[0] if self.modes[-1] else self.memory[self.parameters[0]]
-        arg2 = self.parameters[1] if self.modes[-2] else self.memory[self.parameters[1]]
+        arg1 = self.get_parameter(0)
+        arg2 = self.get_parameter(1)
         self.memory[self.parameters[2]] = arg1 * arg2
         return self.instr_ptr + 1 + self.expected_parameters()
 
@@ -129,7 +132,7 @@ class Output(Instruction):
         return 1
     
     def act(self):
-        value = self.parameters[0] if self.modes[-1] else self.memory[self.parameters[0]]
+        value = self.get_parameter(0)
         if self.computer.output_device is None:
             print(value)
         else:
@@ -147,8 +150,8 @@ class JumpIfTrue(Instruction):
         return 2
 
     def act(self):
-        condition =   self.parameters[0] if self.modes[-1] else self.memory[self.parameters[0]]
-        destination = self.parameters[1] if self.modes[-2] else self.memory[self.parameters[1]]
+        condition =   self.get_parameter(0)
+        destination = self.get_parameter(1)
         if condition:
             return destination
         else:
@@ -165,8 +168,8 @@ class JumpIfFalse(Instruction):
         return 2
 
     def act(self):
-        condition =   self.parameters[0] if self.modes[-1] else self.memory[self.parameters[0]]
-        destination = self.parameters[1] if self.modes[-2] else self.memory[self.parameters[1]]
+        condition =   self.get_parameter(0)
+        destination = self.get_parameter(1)
         if condition:
             return self.instr_ptr + 1 + self.expected_parameters()
         else:
@@ -183,8 +186,8 @@ class LessThan(Instruction):
         return 3
     
     def act(self):
-        arg1 = self.parameters[0] if self.modes[-1] else self.memory[self.parameters[0]]
-        arg2 = self.parameters[1] if self.modes[-2] else self.memory[self.parameters[1]]
+        arg1 = self.get_parameter(0)
+        arg2 = self.get_parameter(1)
         dest = self.parameters[2]
         if arg1 < arg2:
             self.memory[dest] = 1
@@ -203,8 +206,8 @@ class Equals(Instruction):
         return 3
 
     def act(self):
-        arg1 = self.parameters[0] if self.modes[-1] else self.memory[self.parameters[0]]
-        arg2 = self.parameters[1] if self.modes[-2] else self.memory[self.parameters[1]]
+        arg1 = self.get_parameter(0)
+        arg2 = self.get_parameter(1)
         dest = self.parameters[2]
         if arg1 == arg2:
             self.memory[dest] = 1
