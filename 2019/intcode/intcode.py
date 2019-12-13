@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from queue import Queue
 
 POSITION_MODE = 0
 IMMEDIATE_MODE = 1
@@ -237,8 +238,10 @@ class Intcode:
         if self.input_device is None:
             print('Enter value: ')
             value = input()
-        else:
+        elif type(self.input_device) == list:
             value = self.input_device.pop(0)
+        elif type(self.input_device) == Queue:
+            value = self.input_device.get()
         if type(value) is str:
             value = int(value.strip())
         return value
@@ -246,8 +249,10 @@ class Intcode:
     def write_output(self, value):
         if self.output_device is None:
             print(value)
-        else:
+        elif type(self.output_device) == list:
             self.output_device.append(value)
+        elif type(self.output_device) == Queue:
+            self.output_device.put(value)
 
     def write_memory(self):
         print(','.join([str(i) for i in self.memory]))
