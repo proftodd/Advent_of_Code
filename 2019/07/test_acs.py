@@ -1,5 +1,4 @@
 import acs
-import intcode.intcode
 
 settings = [0, 1, 2, 3, 4]
 
