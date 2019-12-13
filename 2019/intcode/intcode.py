@@ -1,5 +1,3 @@
-import sys
-
 from abc import ABC, abstractmethod
 
 POSITION_MODE = 0
@@ -116,15 +114,8 @@ class Input(Instruction):
     
     def act(self):
         dest = self.parameters[0]
-        if self.computer.input_device is None:
-            print('Enter value: ')
-            value = input()
-        else:
-            value = self.computer.input_device.pop(0)
-        if type(value) is str:
-            self.memory[dest] = int(value.strip())
-        else:
-            self.memory[dest] = value
+        value = self.computer.read_input()
+        self.memory[dest] = value
         return self.advance_pointer()
 
 
@@ -139,10 +130,7 @@ class Output(Instruction):
     
     def act(self):
         value = self.get_parameter(0)
-        if self.computer.output_device is None:
-            print(value)
-        else:
-            self.computer.output_device.append(value)
+        self.computer.write_output(value)
         return self.advance_pointer()
 
 
@@ -244,6 +232,22 @@ class Intcode:
         while instr_ptr >= 0:
             current_instr = Instruction.create_instruction(self, instr_ptr, self.memory)
             instr_ptr = current_instr.act()
+    
+    def read_input(self):
+        if self.input_device is None:
+            print('Enter value: ')
+            value = input()
+        else:
+            value = self.input_device.pop(0)
+        if type(value) is str:
+            value = int(value.strip())
+        return value
+    
+    def write_output(self, value):
+        if self.output_device is None:
+            print(value)
+        else:
+            self.output_device.append(value)
 
     def write_memory(self):
         print(','.join([str(i) for i in self.memory]))
