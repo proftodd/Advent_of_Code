@@ -2,19 +2,27 @@ import itertools
 import sys
 import intcode.intcode
 
+from queue import Queue
+from threading import Thread
+
 
 def try_permutation(program, perm):
-    input_buffers = [
-        [perm[0], 0], [perm[1]], [perm[2]], [perm[3]], [perm[4]]
-    ]
-    ss = []
+    labels = 'ABCDE'
+    io_buffers = [Queue()] * len(perm)
+    threads = []
     for i in range(len(perm)):
-        ss.append(intcode.intcode.Intcode(input_buffers[i], input_buffers[(i + 1) % len(perm)]))
-        ss[i].load_memory(program)
-    while len(input_buffers[0]) > 1:
-        for i in range(len(perm)):
-            ss[i].run_program()
-    return input_buffers[0][0]
+        ss = intcode.intcode.Intcode(io_buffers[i], io_buffers[(i + 1) % len(perm)])
+        ss.load_memory(list(program))
+        io_buffers[i].put(perm[i])
+        if i == 0:
+            io_buffers[i].put(0)
+        threads.append(Thread(target=ss.run_program, name=f"Intcode-{labels[i]}"))
+        threads[i].start()
+
+    for t in threads:
+        t.join()
+
+    return io_buffers[0].get()
 
 
 def maximize_thrust(program, settings):
