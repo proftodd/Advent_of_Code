@@ -10,6 +10,7 @@ from intcode.intcode import (
     JumpIfFalse,
     LessThan,
     Equals,
+    RelativeBase,
     Intcode
 )
 
@@ -199,6 +200,22 @@ def test_equal_immediate():
     new_ptr = less_than_false.act()
     assert new_ptr == 4
     assert memory_2 == [1108, 2, 2, 4, 1]
+
+
+def test_relative_base_position():
+    my_ss = Intcode()
+    memory = [9, 2, 10]
+    relative_base = RelativeBase(my_ss, 0, memory)
+    relative_base.act()
+    assert my_ss.relative_base == 10
+
+
+def test_relative_base_immediate():
+    my_ss = Intcode()
+    memory = [1109, 19]
+    relative_base = RelativeBase(my_ss, 0, memory)
+    relative_base.act()
+    assert my_ss.relative_base == 19
 
 
 def test_day_02_example_00():

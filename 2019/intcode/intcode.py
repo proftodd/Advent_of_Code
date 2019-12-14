@@ -211,10 +211,26 @@ class Equals(Instruction):
         return self.advance_pointer()
 
 
+class RelativeBase(Instruction):
+
+    def __init__(self, ss, instr_ptr, memory):
+        super(RelativeBase, self).__init__(ss, instr_ptr, memory)
+
+    @staticmethod
+    def expected_parameters():
+        return 1
+
+    def act(self):
+        arg = self.get_parameter(0)
+        self.computer.relative_base = arg
+        return self.advance_pointer()
+
+
 class Intcode:
 
     def __init__(self, input_device=None, output_device=None):
         self.memory = []
+        self.relative_base = 0
         self.input_device = input_device
         self.output_device = output_device
 
