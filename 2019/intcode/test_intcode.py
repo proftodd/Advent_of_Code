@@ -1,3 +1,5 @@
+import queue
+
 from intcode.intcode import (
     Stop,
     Addition,
@@ -61,6 +63,17 @@ def test_input():
     assert memory == [4, 2, 42]
 
 
+def test_input_queue():
+    q = queue.Queue()
+    q.put('42')
+    my_ss = Intcode(input_device=q)
+    memory = [4, 2, 0]
+    input_instruction = Input(my_ss, 0, memory)
+    new_ptr = input_instruction.act()
+    assert new_ptr == 2
+    assert memory == [4, 2, 42]
+
+
 def test_output_position():
     output_buffer = []
     my_ss = Intcode(output_device=output_buffer)
@@ -79,6 +92,17 @@ def test_output_immediate():
     new_ptr = output_instruction.act()
     assert new_ptr == 2
     assert output_buffer == [69]
+
+
+def test_output_queue():
+    q = queue.Queue()
+    my_ss = Intcode(output_device=q)
+    memory = [5, 2, 69]
+    output_instruction = Output(my_ss, 0, memory)
+    new_ptr = output_instruction.act()
+    assert new_ptr == 2
+    value = q.get()
+    assert value == 69
 
 
 def test_jump_if_true_position():
