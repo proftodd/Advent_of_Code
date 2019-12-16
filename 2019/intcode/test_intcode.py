@@ -39,6 +39,23 @@ def test_addition_immediate_mode():
     assert memory == [1101, 1, 2, 4, 3]
 
 
+def test_addition_cannot_have_destination_parameter_in_IMMEDIATE_mode():
+    try:
+        Addition(ss, 0, [11101, 1, 2, 4, 0])
+        assert False
+    except ValueError:
+        assert True
+
+
+def test_addition_relative_mode():
+    my_ss = Intcode()
+    my_ss.relative_base = 4
+    memory = [22201, 0, 1, 2, 1, 2, 0]
+    adder = Addition(my_ss, 0, memory)
+    adder.act()
+    assert memory == [22201, 0, 1, 2, 1, 2, 3]
+
+
 def test_multiplication_position_mode():
     memory = [2, 0, 2, 4, 0]
     mult_position = Multiplication(ss, 0, memory)
@@ -53,6 +70,23 @@ def test_multiplication_immediate_mode():
     new_ptr = mult_immediate.act()
     assert new_ptr == 4
     assert memory == [1102, 2, 2, 4, 4]
+
+
+def test_multiplication_cannot_have_destination_parameter_in_IMMEDIATE_mode():
+    try:
+        Multiplication(ss, 0, [11102, 1, 2, 4, 0])
+        assert False
+    except ValueError:
+        assert True
+
+
+def test_multiplication_relative_mode():
+    my_ss = Intcode()
+    my_ss.relative_base = 4
+    memory = [22202, 0, 1, 2, 1, 2, 0]
+    adder = Multiplication(my_ss, 0, memory)
+    adder.act()
+    assert memory == [22202, 0, 1, 2, 1, 2, 2]
 
 
 def test_input():
@@ -73,6 +107,25 @@ def test_input_queue():
     new_ptr = input_instruction.act()
     assert new_ptr == 2
     assert memory == [4, 2, 42]
+
+
+def test_input_cannot_have_destination_parameter_in_IMMEDIATE_mode():
+    try:
+        Input(ss, 0, [104, 1])
+        assert False
+    except ValueError:
+        assert True
+
+
+def test_input_relative():
+    q = queue.Queue()
+    q.put('42')
+    my_ss = Intcode(input_device=q)
+    my_ss.relative_base = 2
+    memory = [204, 0, 0]
+    input_instruction = Input(my_ss, 0, memory)
+    input_instruction.act()
+    assert memory == [204, 0, 42]
 
 
 def test_output_position():

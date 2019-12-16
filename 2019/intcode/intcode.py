@@ -3,6 +3,7 @@ from queue import Queue
 
 POSITION_MODE = 0
 IMMEDIATE_MODE = 1
+RELATIVE_MODE = 2
 
 
 class Instruction(ABC):
@@ -26,8 +27,16 @@ class Instruction(ABC):
         pass
 
     def get_parameter(self, index):
-        return self.parameters[index] if self.modes[-1 * (index + 1)] else self.memory[self.parameters[index]]
-    
+        mode = self.modes[-1 * (index + 1)]
+        parameter = self.parameters[index]
+        if mode == POSITION_MODE:
+            return self.memory[parameter]
+        elif mode == IMMEDIATE_MODE:
+            return parameter
+        elif mode == RELATIVE_MODE:
+            position = self.computer.relative_base + parameter
+            return self.memory[position]
+
     @abstractmethod
     def act(self):
         pass
@@ -76,6 +85,8 @@ class Addition(Instruction):
 
     def __init__(self, ss, instr_ptr, memory):
         super(Addition, self).__init__(ss, instr_ptr, memory)
+        if self.modes[0] == IMMEDIATE_MODE:
+            raise ValueError('Addition cannot have a destination parameter in IMMEDIATE mode')
 
     @staticmethod
     def expected_parameters():
@@ -84,7 +95,8 @@ class Addition(Instruction):
     def act(self):
         arg1 = self.get_parameter(0)
         arg2 = self.get_parameter(1)
-        self.memory[self.parameters[2]] = arg1 + arg2
+        dest = self.parameters[2] if self.modes[0] == POSITION_MODE else self.computer.relative_base + self.parameters[2]
+        self.memory[dest] = arg1 + arg2
         return self.advance_pointer()
 
 
@@ -92,6 +104,8 @@ class Multiplication(Instruction):
 
     def __init__(self, ss, instr_ptr, memory):
         super(Multiplication, self).__init__(ss, instr_ptr, memory)
+        if self.modes[0] == IMMEDIATE_MODE:
+            raise ValueError('Multiplication cannot have a destination parameter in IMMEDIATE mode')
 
     @staticmethod
     def expected_parameters():
@@ -100,7 +114,8 @@ class Multiplication(Instruction):
     def act(self):
         arg1 = self.get_parameter(0)
         arg2 = self.get_parameter(1)
-        self.memory[self.parameters[2]] = arg1 * arg2
+        dest = self.parameters[2] if self.modes[0] == POSITION_MODE else self.computer.relative_base + self.parameters[2]
+        self.memory[dest] = arg1 * arg2
         return self.advance_pointer()
 
 
@@ -108,14 +123,16 @@ class Input(Instruction):
 
     def __init__(self, ss, instr_ptr, memory):
         super(Input, self).__init__(ss, instr_ptr, memory)
+        if self.modes[0] == IMMEDIATE_MODE:
+            raise ValueError('Input cannot have a destination parameter in IMMEDIATE mode')
 
     @staticmethod
     def expected_parameters():
         return 1
     
     def act(self):
-        dest = self.parameters[0]
         value = self.computer.read_input()
+        dest = self.parameters[0] if self.modes[0] == POSITION_MODE else self.computer.relative_base + self.parameters[0]
         self.memory[dest] = value
         return self.advance_pointer()
 
