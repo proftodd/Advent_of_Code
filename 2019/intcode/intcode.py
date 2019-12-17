@@ -256,25 +256,25 @@ class RelativeBase(Instruction):
 class Intcode:
 
     def __init__(self, input_device=None, output_device=None):
-        self.memory = []
+        self.program = []
         self.relative_base = 0
         self.input_device = input_device
         self.output_device = output_device
 
     @staticmethod
-    def read_memory(filename):
+    def read_program(filename):
         fp = open(filename, 'r')
         line = fp.readline().strip()
         fp.close()
         return list(map(int, line.split(',')))
 
-    def load_memory(self, memory):
-        self.memory = memory
+    def load_program(self, program):
+        self.program = program
 
     def run_program(self):
         instr_ptr = 0
         while instr_ptr >= 0:
-            current_instr = Instruction.create_instruction(self, instr_ptr, self.memory)
+            current_instr = Instruction.create_instruction(self, instr_ptr, self.program)
             instr_ptr = current_instr.act()
     
     def read_input(self):
@@ -297,5 +297,5 @@ class Intcode:
         elif type(self.output_device) == Queue:
             self.output_device.put(value)
 
-    def write_memory(self):
-        print(','.join([str(i) for i in self.memory]))
+    def write_program(self):
+        print(','.join([str(i) for i in self.program]))

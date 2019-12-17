@@ -12,7 +12,7 @@ def try_permutation(program, perm):
     threads = []
     for i in range(len(perm)):
         ss = intcode.intcode.Intcode(io_buffers[i], io_buffers[(i + 1) % len(perm)])
-        ss.load_memory(list(program))
+        ss.load_program(list(program))
         io_buffers[i].put(perm[i])
         if i == 0:
             io_buffers[i].put(0)
@@ -37,7 +37,7 @@ def maximize_thrust(program, settings):
 
 
 def main():
-    program = intcode.intcode.Intcode.read_memory(sys.argv[1])
+    program = intcode.intcode.Intcode.read_program(sys.argv[1])
     settings = [5, 6, 7, 8, 9]
     max_thrust, best_settings = maximize_thrust(program, settings)
     print(f"maximum thrust of {max_thrust} achieved with {best_settings}")

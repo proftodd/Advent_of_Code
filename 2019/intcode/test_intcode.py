@@ -324,62 +324,62 @@ def test_relative_base_relative():
 
 def test_day_02_example_00():
     memory = [99]
-    ss.load_memory(memory)
+    ss.load_program(memory)
     ss.run_program()
     assert memory == [99]
 
 
 def test_day_02_example_01():
     memory = [1, 0, 0, 0, 99]
-    ss.load_memory(memory)
+    ss.load_program(memory)
     ss.run_program()
     assert memory == [2, 0, 0, 0, 99]
 
 
 def test_day_02_example_02():
     memory = [2, 3, 0, 3, 99]
-    ss.load_memory(memory)
+    ss.load_program(memory)
     ss.run_program()
     assert memory == [2, 3, 0, 6, 99]
 
 
 def test_day_02_example_03():
     memory = [2, 4, 4, 5, 99, 0]
-    ss.load_memory(memory)
+    ss.load_program(memory)
     ss.run_program()
     assert memory == [2, 4, 4, 5, 99, 9801]
 
 
 def test_day_03_example_04():
     memory = [1, 1, 1, 4, 99, 5, 6, 0, 99]
-    ss.load_memory(memory)
+    ss.load_program(memory)
     ss.run_program()
     assert memory == [30, 1, 1, 4, 2, 5, 6, 0, 99]
 
 
 def test_day_04_input():
-    program = Intcode.read_memory('../02/input.txt')
-    ss.load_memory(program)
+    program = Intcode.read_program('../02/input.txt')
+    ss.load_program(program)
     ss.run_program()
-    assert ss.memory[0] == 394702
+    assert ss.program[0] == 394702
 
 
 def test_day_04_corrected_input():
-    memory = Intcode.read_memory('../02/input.txt')
+    memory = Intcode.read_program('../02/input.txt')
     memory[1] = 12
     memory[2] = 2
-    ss.load_memory(memory)
+    ss.load_program(memory)
     ss.run_program()
-    assert ss.memory[0] == 3850704
+    assert ss.program[0] == 3850704
 
 
 def test_day_04_part_2():
-    memory = Intcode.read_memory('../02/input.txt')
+    memory = Intcode.read_program('../02/input.txt')
     memory[1] = 67
     memory[2] = 18
-    ss.load_memory(memory)
+    ss.load_program(memory)
     ss.run_program()
-    assert ss.memory[0] == 19690720
+    assert ss.program[0] == 19690720
 
 
 def test_day_05_example_01():
@@ -387,7 +387,7 @@ def test_day_05_example_01():
     output_buffer = []
     my_ss = Intcode(input_buffer, output_buffer)
     memory = [3, 0, 4, 0, 99]
-    my_ss.load_memory(memory)
+    my_ss.load_program(memory)
     my_ss.run_program()
     assert memory == [42, 0, 4, 0, 99]
     assert input_buffer == []
@@ -400,7 +400,7 @@ def test_day_05_example_02():
     my_ss = Intcode(input_device=input_buffer_1, output_device=output_buffer_1)
     original_memory = [3, 9, 8, 9, 10, 9, 4, 9, 99, -1, 8]
     memory = list(original_memory)
-    my_ss.load_memory(memory)
+    my_ss.load_program(memory)
     my_ss.run_program()
     assert memory[9] == 0
     assert output_buffer_1 == [0]
@@ -408,7 +408,7 @@ def test_day_05_example_02():
     output_buffer_2 = []
     my_ss = Intcode(input_device=input_buffer_2, output_device=output_buffer_2)
     memory = list(original_memory)
-    my_ss.load_memory(memory)
+    my_ss.load_program(memory)
     my_ss.run_program()
     assert memory[9] == 1
     assert output_buffer_2 == [1]
@@ -420,7 +420,7 @@ def test_day_05_example_03():
     my_ss = Intcode(input_device=input_buffer_1, output_device=output_buffer_1)
     original_memory = [3, 9, 7, 9, 10, 9, 4, 9, 99, -1, 8]
     memory = list(original_memory)
-    my_ss.load_memory(memory)
+    my_ss.load_program(memory)
     my_ss.run_program()
     assert memory[9] == 1
     assert output_buffer_1 == [1]
@@ -428,7 +428,7 @@ def test_day_05_example_03():
     output_buffer_2 = []
     my_ss = Intcode(input_device=input_buffer_2, output_device=output_buffer_2)
     memory = list(original_memory)
-    my_ss.load_memory(memory)
+    my_ss.load_program(memory)
     my_ss.run_program()
     assert memory[9] == 0
     assert output_buffer_2 == [0]
@@ -440,7 +440,7 @@ def test_day_05_example_04():
     my_ss = Intcode(input_device=input_buffer_1, output_device=output_buffer_1)
     original_memory = [3, 3, 1108, -1, 8, 3, 4, 3, 99]
     memory = list(original_memory)
-    my_ss.load_memory(memory)
+    my_ss.load_program(memory)
     my_ss.run_program()
     assert memory == [3, 3, 1108, 0, 8, 3, 4, 3, 99]
     assert output_buffer_1 == [0]
@@ -448,7 +448,7 @@ def test_day_05_example_04():
     output_buffer_2 = []
     my_ss = Intcode(input_device=input_buffer_2, output_device=output_buffer_2)
     memory = list(original_memory)
-    my_ss.load_memory(memory)
+    my_ss.load_program(memory)
     my_ss.run_program()
     assert memory == [3, 3, 1108, 1, 8, 3, 4, 3, 99]
     assert output_buffer_2 == [1]
@@ -460,7 +460,7 @@ def test_day_05_example_05():
     my_ss = Intcode(input_device=input_buffer_1, output_device=output_buffer_1)
     original_memory = [3, 3, 1107, -1, 8, 3, 4, 3, 99]
     memory = list(original_memory)
-    my_ss.load_memory(memory)
+    my_ss.load_program(memory)
     my_ss.run_program()
     assert memory[3] == 1
     assert output_buffer_1 == [1]
@@ -468,7 +468,7 @@ def test_day_05_example_05():
     output_buffer_2 = []
     my_ss = Intcode(input_device=input_buffer_2, output_device=output_buffer_2)
     memory = list(original_memory)
-    my_ss.load_memory(memory)
+    my_ss.load_program(memory)
     my_ss.run_program()
     assert memory[3] == 0
     assert output_buffer_2 == [0]
@@ -480,7 +480,7 @@ def test_day_05_example_06():
     my_ss = Intcode(input_device=input_buffer_1, output_device=output_buffer_1)
     original_memory = [3, 12, 6, 12, 15, 1, 13, 14, 13, 4, 13, 99, -1, 0, 1, 9]
     memory = list(original_memory)
-    my_ss.load_memory(memory)
+    my_ss.load_program(memory)
     my_ss.run_program()
     assert memory[12] == 1
     assert output_buffer_1 == [1]
@@ -488,7 +488,7 @@ def test_day_05_example_06():
     output_buffer_2 = []
     my_ss = Intcode(input_device=input_buffer_2, output_device=output_buffer_2)
     memory = list(original_memory)
-    my_ss.load_memory(memory)
+    my_ss.load_program(memory)
     my_ss.run_program()
     assert memory[12] == 0
     assert output_buffer_2 == [0]
@@ -500,7 +500,7 @@ def test_day_05_example_07():
     output_buffer_1 = []
     my_ss = Intcode(input_device=input_buffer_1, output_device=output_buffer_1)
     memory = list(original_memory)
-    my_ss.load_memory(memory)
+    my_ss.load_program(memory)
     my_ss.run_program()
     assert memory == [3, 3, 1105, 1, 9, 1101, 0, 0, 12, 4, 12, 99, 1]
     assert output_buffer_1 == [1]
@@ -508,7 +508,7 @@ def test_day_05_example_07():
     output_buffer_2 = []
     my_ss = Intcode(input_device=input_buffer_2, output_device=output_buffer_2)
     memory = list(original_memory)
-    my_ss.load_memory(memory)
+    my_ss.load_program(memory)
     my_ss.run_program()
     assert memory == [3, 3, 1105, 0, 9, 1101, 0, 0, 12, 4, 12, 99, 0]
     assert output_buffer_2 == [0]
@@ -520,20 +520,20 @@ def test_day_05_example_08():
     output_buffer_1 = []
     ss_1 = Intcode(input_device=input_buffer_1, output_device=output_buffer_1)
     memory = list(original_memory)
-    ss_1.load_memory(memory)
+    ss_1.load_program(memory)
     ss_1.run_program()
     assert output_buffer_1 == [999]
     input_buffer_2 = ['8']
     output_buffer_2 = []
     ss_2 = Intcode(input_device=input_buffer_2, output_device=output_buffer_2)
     memory = list(original_memory)
-    ss_2.load_memory(memory)
+    ss_2.load_program(memory)
     ss_2.run_program()
     assert output_buffer_2 == [1000]
     input_buffer_3 = ['9']
     output_buffer_3 = []
     ss_3 = Intcode(input_device=input_buffer_3, output_device=output_buffer_3)
     memory = list(original_memory)
-    ss_3.load_memory(memory)
+    ss_3.load_program(memory)
     ss_3.run_program()
     assert output_buffer_3 == [1001]
