@@ -8,11 +8,10 @@ RELATIVE_MODE = 2
 
 class Instruction(ABC):
 
-    def __init__(self, computer, instr_ptr, memory):
+    def __init__(self, computer, instr_ptr):
         self.computer = computer
         self.instr_ptr = instr_ptr
-        self.memory = memory
-        opcode = memory[instr_ptr]
+        opcode = self.computer.program[instr_ptr]
         modes = list(map(int, str(opcode // 100)))
         while len(modes) < self.expected_parameters():
             modes.insert(0, POSITION_MODE)
@@ -20,7 +19,7 @@ class Instruction(ABC):
         self.modes.reverse()
         parameter_start = instr_ptr + 1
         parameter_end = parameter_start + self.expected_parameters()
-        self.parameters = memory[parameter_start:parameter_end]
+        self.parameters = self.computer.program[parameter_start:parameter_end]
 
     @staticmethod
     @abstractmethod
@@ -51,33 +50,33 @@ class Instruction(ABC):
         return self.instr_ptr + 1 + self.expected_parameters()
 
     @staticmethod
-    def create_instruction(ss, instr_ptr, memory):
-        opcode = memory[instr_ptr]
+    def create_instruction(ss, instr_ptr):
+        opcode = ss.program[instr_ptr]
         instr_code = opcode % 100
         if instr_code == 99:
-            return Stop(ss, instr_ptr, memory)
+            return Stop(ss, instr_ptr)
         elif instr_code == 1:
-            return Addition(ss, instr_ptr, memory)
+            return Addition(ss, instr_ptr)
         elif instr_code == 2:
-            return Multiplication(ss, instr_ptr, memory)
+            return Multiplication(ss, instr_ptr)
         elif instr_code == 3:
-            return Input(ss, instr_ptr, memory)
+            return Input(ss, instr_ptr)
         elif instr_code == 4:
-            return Output(ss, instr_ptr, memory)
+            return Output(ss, instr_ptr)
         elif instr_code == 5:
-            return JumpIfTrue(ss, instr_ptr, memory)
+            return JumpIfTrue(ss, instr_ptr)
         elif instr_code == 6:
-            return JumpIfFalse(ss, instr_ptr, memory)
+            return JumpIfFalse(ss, instr_ptr)
         elif instr_code == 7:
-            return LessThan(ss, instr_ptr, memory)
+            return LessThan(ss, instr_ptr)
         elif instr_code == 8:
-            return Equals(ss, instr_ptr, memory)
+            return Equals(ss, instr_ptr)
 
 
 class Stop(Instruction):
 
-    def __init__(self, ss, instr_ptr, memory):
-        super(Stop, self).__init__(ss, instr_ptr, memory)
+    def __init__(self, ss, instr_ptr):
+        super(Stop, self).__init__(ss, instr_ptr)
 
     @staticmethod
     def expected_parameters():
@@ -89,8 +88,8 @@ class Stop(Instruction):
 
 class Addition(Instruction):
 
-    def __init__(self, ss, instr_ptr, memory):
-        super(Addition, self).__init__(ss, instr_ptr, memory)
+    def __init__(self, ss, instr_ptr):
+        super(Addition, self).__init__(ss, instr_ptr)
         if self.modes[2] == IMMEDIATE_MODE:
             raise ValueError('Addition cannot have a destination parameter in IMMEDIATE mode')
 
@@ -108,8 +107,8 @@ class Addition(Instruction):
 
 class Multiplication(Instruction):
 
-    def __init__(self, ss, instr_ptr, memory):
-        super(Multiplication, self).__init__(ss, instr_ptr, memory)
+    def __init__(self, ss, instr_ptr):
+        super(Multiplication, self).__init__(ss, instr_ptr)
         if self.modes[2] == IMMEDIATE_MODE:
             raise ValueError('Multiplication cannot have a destination parameter in IMMEDIATE mode')
 
@@ -127,8 +126,8 @@ class Multiplication(Instruction):
 
 class Input(Instruction):
 
-    def __init__(self, ss, instr_ptr, memory):
-        super(Input, self).__init__(ss, instr_ptr, memory)
+    def __init__(self, ss, instr_ptr):
+        super(Input, self).__init__(ss, instr_ptr)
         if self.modes[0] == IMMEDIATE_MODE:
             raise ValueError('Input cannot have a destination parameter in IMMEDIATE mode')
 
@@ -145,8 +144,8 @@ class Input(Instruction):
 
 class Output(Instruction):
 
-    def __init__(self, ss, instr_ptr, memory):
-        super(Output, self).__init__(ss, instr_ptr, memory)
+    def __init__(self, ss, instr_ptr):
+        super(Output, self).__init__(ss, instr_ptr)
 
     @staticmethod
     def expected_parameters():
@@ -160,8 +159,8 @@ class Output(Instruction):
 
 class JumpIfTrue(Instruction):
 
-    def __init__(self, ss, instr_ptr, memory):
-        super(JumpIfTrue, self).__init__(ss, instr_ptr, memory)
+    def __init__(self, ss, instr_ptr):
+        super(JumpIfTrue, self).__init__(ss, instr_ptr)
 
     @staticmethod
     def expected_parameters():
@@ -178,8 +177,8 @@ class JumpIfTrue(Instruction):
 
 class JumpIfFalse(Instruction):
 
-    def __init__(self, ss, instr_ptr, memory):
-        super(JumpIfFalse, self).__init__(ss, instr_ptr, memory)
+    def __init__(self, ss, instr_ptr):
+        super(JumpIfFalse, self).__init__(ss, instr_ptr)
 
     @staticmethod
     def expected_parameters():
@@ -196,8 +195,8 @@ class JumpIfFalse(Instruction):
 
 class LessThan(Instruction):
 
-    def __init__(self, ss, instr_ptr, memory):
-        super(LessThan, self).__init__(ss, instr_ptr, memory)
+    def __init__(self, ss, instr_ptr):
+        super(LessThan, self).__init__(ss, instr_ptr)
         if self.modes[2] == IMMEDIATE_MODE:
             raise ValueError('LessThan cannot have a destination parameter in IMMEDIATE mode')
 
@@ -218,8 +217,8 @@ class LessThan(Instruction):
 
 class Equals(Instruction):
 
-    def __init__(self, ss, instr_ptr, memory):
-        super(Equals, self).__init__(ss, instr_ptr, memory)
+    def __init__(self, ss, instr_ptr):
+        super(Equals, self).__init__(ss, instr_ptr)
         if self.modes[2] == IMMEDIATE_MODE:
             raise ValueError('LessThan cannot have a destination parameter in IMMEDIATE mode')
 
@@ -240,8 +239,8 @@ class Equals(Instruction):
 
 class RelativeBase(Instruction):
 
-    def __init__(self, ss, instr_ptr, memory):
-        super(RelativeBase, self).__init__(ss, instr_ptr, memory)
+    def __init__(self, ss, instr_ptr):
+        super(RelativeBase, self).__init__(ss, instr_ptr)
 
     @staticmethod
     def expected_parameters():
@@ -275,7 +274,7 @@ class Intcode:
     def run_program(self):
         instr_ptr = 0
         while instr_ptr >= 0:
-            current_instr = Instruction.create_instruction(self, instr_ptr, self.program)
+            current_instr = Instruction.create_instruction(self, instr_ptr)
             instr_ptr = current_instr.act()
 
     def read_memory(self, position):
