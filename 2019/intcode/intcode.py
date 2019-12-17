@@ -37,11 +37,11 @@ class Instruction(ABC):
     def get_parameter(self, index):
         mode = self.modes[index]
         if mode == POSITION_MODE:
-            return self.memory[self.get_memory_position(index)]
+            return self.computer.read_memory(self.get_memory_position(index))
         elif mode == IMMEDIATE_MODE:
             return self.parameters[index]
         elif mode == RELATIVE_MODE:
-            return self.memory[self.get_memory_position(index)]
+            return self.computer.read_memory(self.get_memory_position(index))
 
     @abstractmethod
     def act(self):
@@ -102,7 +102,7 @@ class Addition(Instruction):
         arg1 = self.get_parameter(0)
         arg2 = self.get_parameter(1)
         dest = self.get_memory_position(2)
-        self.memory[dest] = arg1 + arg2
+        self.computer.write_memory(dest, arg1 + arg2)
         return self.advance_pointer()
 
 
@@ -121,7 +121,7 @@ class Multiplication(Instruction):
         arg1 = self.get_parameter(0)
         arg2 = self.get_parameter(1)
         dest = self.get_memory_position(2)
-        self.memory[dest] = arg1 * arg2
+        self.computer.write_memory(dest, arg1 * arg2)
         return self.advance_pointer()
 
 
@@ -139,7 +139,7 @@ class Input(Instruction):
     def act(self):
         value = self.computer.read_input()
         dest = self.get_memory_position(0)
-        self.memory[dest] = value
+        self.computer.write_memory(dest, value)
         return self.advance_pointer()
 
 
@@ -210,9 +210,9 @@ class LessThan(Instruction):
         arg2 = self.get_parameter(1)
         dest = self.get_memory_position(2)
         if arg1 < arg2:
-            self.memory[dest] = 1
+            self.computer.write_memory(dest, 1)
         else:
-            self.memory[dest] = 0
+            self.computer.write_memory(dest, 0)
         return self.advance_pointer()
 
 
@@ -232,9 +232,9 @@ class Equals(Instruction):
         arg2 = self.get_parameter(1)
         dest = self.get_memory_position(2)
         if arg1 == arg2:
-            self.memory[dest] = 1
+            self.computer.write_memory(dest, 1)
         else:
-            self.memory[dest] = 0
+            self.computer.write_memory(dest, 0)
         return self.advance_pointer()
 
 
@@ -257,6 +257,7 @@ class Intcode:
 
     def __init__(self, input_device=None, output_device=None):
         self.program = []
+        self.memory = {}
         self.relative_base = 0
         self.input_device = input_device
         self.output_device = output_device
@@ -276,6 +277,18 @@ class Intcode:
         while instr_ptr >= 0:
             current_instr = Instruction.create_instruction(self, instr_ptr, self.program)
             instr_ptr = current_instr.act()
+
+    def read_memory(self, position):
+        if position < len(self.program):
+            return self.program[position]
+        else:
+            return self.memory[position - len(self.program)]
+
+    def write_memory(self, position, value):
+        if position < len(self.program):
+            self.program[position] = value
+        else:
+            self.memory[position - len(self.program)] = value
     
     def read_input(self):
         if self.input_device is None:

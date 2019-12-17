@@ -18,25 +18,29 @@ ss = Intcode()
 
 
 def test_stop():
-    stop = Stop(ss, 0, [99])
+    program = [99]
+    ss.load_program(program)
+    stop = Stop(ss, 0, program)
     new_ptr = stop.act()
     assert new_ptr == -1
 
 
 def test_addition_position_mode():
-    memory = [1, 0, 1, 4, 0]
-    adder = Addition(ss, 0, memory)
+    program = [1, 0, 1, 4, 0]
+    ss.load_program(program)
+    adder = Addition(ss, 0, program)
     new_ptr = adder.act()
     assert new_ptr == 4
-    assert memory == [1, 0, 1, 4, 1]
+    assert ss.read_memory(4) == 1
 
 
 def test_addition_immediate_mode():
-    memory = [1101, 1, 2, 4, 0]
-    adder_immediate = Addition(ss, 0, memory)
+    program = [1101, 1, 2, 4, 0]
+    ss.load_program(program)
+    adder_immediate = Addition(ss, 0, program)
     new_ptr = adder_immediate.act()
     assert new_ptr == 4
-    assert memory == [1101, 1, 2, 4, 3]
+    assert ss.read_memory(4) == 3
 
 
 def test_addition_cannot_have_destination_parameter_in_IMMEDIATE_mode():
@@ -48,28 +52,30 @@ def test_addition_cannot_have_destination_parameter_in_IMMEDIATE_mode():
 
 
 def test_addition_relative_mode():
-    my_ss = Intcode()
-    my_ss.relative_base = 4
-    memory = [22201, 0, 1, 2, 1, 2, 0]
-    adder = Addition(my_ss, 0, memory)
+    program = [22201, 0, 1, 2, 1, 2, 0]
+    ss.load_program(program)
+    ss.relative_base = 4
+    adder = Addition(ss, 0, program)
     adder.act()
-    assert memory == [22201, 0, 1, 2, 1, 2, 3]
+    assert ss.read_memory(6) == 3
 
 
 def test_multiplication_position_mode():
-    memory = [2, 0, 2, 4, 0]
-    mult_position = Multiplication(ss, 0, memory)
+    program = [2, 0, 2, 4, 0]
+    ss.load_program(program)
+    mult_position = Multiplication(ss, 0, program)
     new_ptr = mult_position.act()
     assert new_ptr == 4
-    assert memory == [2, 0, 2, 4, 4]
+    assert ss.read_memory(4) == 4
 
 
 def test_multiplication_immediate_mode():
-    memory = [1102, 2, 2, 4, 0]
-    mult_immediate = Multiplication(ss, 0, memory)
+    program = [1102, 2, 2, 4, 0]
+    ss.load_program(program)
+    mult_immediate = Multiplication(ss, 0, program)
     new_ptr = mult_immediate.act()
     assert new_ptr == 4
-    assert memory == [1102, 2, 2, 4, 4]
+    assert ss.read_memory(4) == 4
 
 
 def test_multiplication_cannot_have_destination_parameter_in_IMMEDIATE_mode():
@@ -81,32 +87,34 @@ def test_multiplication_cannot_have_destination_parameter_in_IMMEDIATE_mode():
 
 
 def test_multiplication_relative_mode():
-    my_ss = Intcode()
-    my_ss.relative_base = 4
-    memory = [22202, 0, 1, 2, 1, 2, 0]
-    multiplier = Multiplication(my_ss, 0, memory)
+    program = [22202, 0, 1, 2, 1, 2, 0]
+    ss.load_program(program)
+    ss.relative_base = 4
+    multiplier = Multiplication(ss, 0, program)
     multiplier.act()
-    assert memory == [22202, 0, 1, 2, 1, 2, 2]
+    assert ss.read_memory(6) == 2
 
 
 def test_input():
+    program = [4, 2, 0]
     my_ss = Intcode(input_device=['42'])
-    memory = [4, 2, 0]
-    input_instruction = Input(my_ss, 0, memory)
+    my_ss.load_program(program)
+    input_instruction = Input(my_ss, 0, program)
     new_ptr = input_instruction.act()
     assert new_ptr == 2
-    assert memory == [4, 2, 42]
+    assert my_ss.read_memory(2) == 42
 
 
 def test_input_queue():
+    program = [4, 2, 0]
     q = queue.Queue()
     q.put('42')
     my_ss = Intcode(input_device=q)
-    memory = [4, 2, 0]
-    input_instruction = Input(my_ss, 0, memory)
+    my_ss.load_program(program)
+    input_instruction = Input(my_ss, 0, program)
     new_ptr = input_instruction.act()
     assert new_ptr == 2
-    assert memory == [4, 2, 42]
+    assert my_ss.read_memory(2) == 42
 
 
 def test_input_cannot_have_destination_parameter_in_IMMEDIATE_mode():
@@ -118,41 +126,45 @@ def test_input_cannot_have_destination_parameter_in_IMMEDIATE_mode():
 
 
 def test_input_relative():
+    program = [204, 0, 0]
     q = queue.Queue()
     q.put('42')
     my_ss = Intcode(input_device=q)
+    my_ss.load_program(program)
     my_ss.relative_base = 2
-    memory = [204, 0, 0]
-    input_instruction = Input(my_ss, 0, memory)
+    input_instruction = Input(my_ss, 0, program)
     input_instruction.act()
-    assert memory == [204, 0, 42]
+    assert my_ss.read_memory(2) == 42
 
 
 def test_output_position():
+    program = [5, 2, 69]
     output_buffer = []
     my_ss = Intcode(output_device=output_buffer)
-    memory = [5, 2, 69]
-    output_instruction = Output(my_ss, 0, memory)
+    my_ss.load_program(program)
+    output_instruction = Output(my_ss, 0, program)
     new_ptr = output_instruction.act()
     assert new_ptr == 2
     assert output_buffer == [69]
 
 
 def test_output_immediate():
+    program = [105, 69]
     output_buffer = []
     my_ss = Intcode(output_device=output_buffer)
-    memory = [105, 69]
-    output_instruction = Output(my_ss, 0, memory)
+    my_ss.load_program(program)
+    output_instruction = Output(my_ss, 0, program)
     new_ptr = output_instruction.act()
     assert new_ptr == 2
     assert output_buffer == [69]
 
 
 def test_output_queue():
+    program = [5, 2, 69]
     q = queue.Queue()
     my_ss = Intcode(output_device=q)
-    memory = [5, 2, 69]
-    output_instruction = Output(my_ss, 0, memory)
+    my_ss.load_program(program)
+    output_instruction = Output(my_ss, 0, program)
     new_ptr = output_instruction.act()
     assert new_ptr == 2
     value = q.get()
@@ -160,73 +172,85 @@ def test_output_queue():
 
 
 def test_jump_if_true_position():
-    memory = [5, 3, 2, 1]
-    jump_true = JumpIfTrue(ss, 0, memory)
+    program = [5, 3, 2, 1]
+    ss.load_program(program)
+    jump_true = JumpIfTrue(ss, 0, program)
     new_ptr = jump_true.act()
     assert new_ptr == 2
-    memory = [5, 3, 2, 0]
-    jump_false = JumpIfTrue(ss, 0, memory)
+    program = [5, 3, 2, 0]
+    ss.load_program(program)
+    jump_false = JumpIfTrue(ss, 0, program)
     new_ptr = jump_false.act()
     assert new_ptr == 3
 
 
 def test_jump_if_true_immediate():
-    memory = [1105, 1, 2]
-    will_true = JumpIfTrue(ss, 0, memory)
+    program = [1105, 1, 2]
+    ss.load_program(program)
+    will_true = JumpIfTrue(ss, 0, program)
     new_ptr = will_true.act()
     assert new_ptr == 2
-    memory = [1105, 0, 2]
-    wont_jump = JumpIfTrue(ss, 0, memory)
+    program = [1105, 0, 2]
+    ss.load_program(program)
+    wont_jump = JumpIfTrue(ss, 0, program)
     new_ptr = wont_jump.act()
     assert new_ptr == 3
 
 
 def test_jump_if_false_position():
-    memory = [6, 3, 2, 0]
-    will_jump = JumpIfFalse(ss, 0, memory)
+    program = [6, 3, 2, 0]
+    ss.load_program(program)
+    will_jump = JumpIfFalse(ss, 0, program)
     new_ptr = will_jump.act()
     assert new_ptr == 2
-    memory = [6, 3, 2, 1]
-    wont_jump = JumpIfFalse(ss, 0, memory)
+    program = [6, 3, 2, 1]
+    ss.load_program(program)
+    wont_jump = JumpIfFalse(ss, 0, program)
     new_ptr = wont_jump.act()
     assert new_ptr == 3
 
 
 def test_jump_if_false_immediate():
-    memory = [1106, 0, 2]
-    will_jump = JumpIfFalse(ss, 0, memory)
+    program = [1106, 0, 2]
+    ss.load_program(program)
+    will_jump = JumpIfFalse(ss, 0, program)
     new_ptr = will_jump.act()
     assert new_ptr == 2
-    memory = [1106, 1, 2]
-    wont_jump = JumpIfFalse(ss, 0, memory)
+    program = [1106, 1, 2]
+    ss.load_program(program)
+    wont_jump = JumpIfFalse(ss, 0, program)
     new_ptr = wont_jump.act()
     assert new_ptr == 3
 
 
 def test_less_than_position():
-    memory_1 = [7, 0, 2, 4, 0]
-    less_than_true = LessThan(ss, 0, memory_1)
+    program = [7, 0, 2, 4, 0]
+    ss.load_program(program)
+    less_than_true = LessThan(ss, 0, program)
     new_ptr = less_than_true.act()
     assert new_ptr == 4
-    assert memory_1 == [7, 0, 2, 4, 0]
-    memory_2 = [7, 4, 2, 4, 0]
-    less_than_false = LessThan(ss, 0, memory_2)
+    assert ss.read_memory(4) == 0
+    program = [7, 4, 2, 4, 0]
+    ss.load_program(program)
+    less_than_false = LessThan(ss, 0, program)
     new_ptr = less_than_false.act()
     assert new_ptr == 4
-    assert memory_2 == [7, 4, 2, 4, 1]
+    assert ss.read_memory(4) == 1
 
 
 def test_less_than_immediate():
-    memory_1 = [1107, 0, 2, 4, 0]
-    less_than_true = LessThan(ss, 0, memory_1)
+    program = [1107, 0, 2, 4, 0]
+    ss.load_program(program)
+    less_than_true = LessThan(ss, 0, program)
     new_ptr = less_than_true.act()
     assert new_ptr == 4
-    assert memory_1 == [1107, 0, 2, 4, 1]
-    memory_2 = [1107, 3, 2, 4, 0]
-    less_than_false = LessThan(ss, 0, memory_2)
+    assert ss.read_memory(4) == 1
+    program = [1107, 4, 2, 4, 0]
+    ss.load_program(program)
+    less_than_false = LessThan(ss, 0, program)
     new_ptr = less_than_false.act()
     assert new_ptr == 4
-    assert memory_2 == [1107, 3, 2, 4, 0]
+    assert ss.read_memory(4) == 0
 
 
 def test_less_than_cannot_have_destination_parameter_in_IMMEDIATE_mode():
@@ -238,42 +262,48 @@ def test_less_than_cannot_have_destination_parameter_in_IMMEDIATE_mode():
 
 
 def test_less_than_relative_mode():
+    program = [22207, 0, 1, 2, 1, 2, -1]
     my_ss = Intcode()
+    my_ss.load_program(program)
     my_ss.relative_base = 4
-    memory = [22207, 0, 1, 2, 1, 2, -1]
-    lt_true = LessThan(my_ss, 0, memory)
+    lt_true = LessThan(my_ss, 0, program)
     lt_true.act()
-    assert memory == [22207, 0, 1, 2, 1, 2, 1]
-    memory = [22207, 0, 1, 2, 3, 2, -1]
-    lt_false = LessThan(my_ss, 0, memory)
+    assert my_ss.read_memory(6) == 1
+    program = [22207, 0, 1, 2, 3, 2, -1]
+    my_ss.load_program(program)
+    lt_false = LessThan(my_ss, 0, program)
     lt_false.act()
-    assert memory == [22207, 0, 1, 2, 3, 2, 0]
+    assert my_ss.read_memory(6) == 0
 
 
 def test_equal_position():
-    memory_1 = [8, 0, 2, 4, 0]
-    less_than_true = Equals(ss, 0, memory_1)
+    program = [8, 0, 2, 4, 0]
+    ss.load_program(program)
+    less_than_true = Equals(ss, 0, program)
     new_ptr = less_than_true.act()
     assert new_ptr == 4
-    assert memory_1 == [8, 0, 2, 4, 0]
-    memory_2 = [8, 4, 5, 6, 0, 0, 0]
-    less_than_false = Equals(ss, 0, memory_2)
+    assert ss.read_memory(4) == 0
+    program = [8, 4, 5, 6, 0, 0, 0]
+    ss.load_program(program)
+    less_than_false = Equals(ss, 0, program)
     new_ptr = less_than_false.act()
     assert new_ptr == 4
-    assert memory_2 == [8, 4, 5, 6, 0, 0, 1]
+    assert ss.read_memory(6) == 1
 
 
 def test_equal_immediate():
-    memory_1 = [1108, 0, 2, 4, 0]
-    less_than_true = Equals(ss, 0, memory_1)
+    program = [1108, 0, 2, 4, 0]
+    ss.load_program(program)
+    less_than_true = Equals(ss, 0, program)
     new_ptr = less_than_true.act()
     assert new_ptr == 4
-    assert memory_1 == [1108, 0, 2, 4, 0]
-    memory_2 = [1108, 2, 2, 4, 0]
-    less_than_false = Equals(ss, 0, memory_2)
+    assert ss.read_memory(4) == 0
+    program = [1108, 2, 2, 4, 0]
+    ss.load_program(program)
+    less_than_false = Equals(ss, 0, program)
     new_ptr = less_than_false.act()
     assert new_ptr == 4
-    assert memory_2 == [1108, 2, 2, 4, 1]
+    assert ss.read_memory(4) == 1
 
 
 def test_equals_cannot_have_destination_parameter_in_IMMEDIATE_mode():
@@ -285,39 +315,44 @@ def test_equals_cannot_have_destination_parameter_in_IMMEDIATE_mode():
 
 
 def test_equals_relative_mode():
+    program = [22208, 0, 1, 2, 1, 1, -1]
     my_ss = Intcode()
+    my_ss.load_program(program)
     my_ss.relative_base = 4
-    memory = [22208, 0, 1, 2, 1, 1, -1]
-    eq_true = Equals(my_ss, 0, memory)
+    eq_true = Equals(my_ss, 0, program)
     eq_true.act()
-    assert memory == [22208, 0, 1, 2, 1, 1, 1]
-    memory = [22208, 0, 1, 2, 3, 2, -1]
-    eq_false = Equals(my_ss, 0, memory)
+    assert my_ss.read_memory(6) == 1
+    program = [22208, 0, 1, 2, 3, 2, -1]
+    my_ss.load_program(program)
+    eq_false = Equals(my_ss, 0, program)
     eq_false.act()
-    assert memory == [22208, 0, 1, 2, 3, 2, 0]
+    assert my_ss.read_memory(6) == 0
 
 
 def test_relative_base_position():
+    program = [9, 2, 10]
     my_ss = Intcode()
-    memory = [9, 2, 10]
-    relative_base = RelativeBase(my_ss, 0, memory)
+    my_ss.load_program(program)
+    relative_base = RelativeBase(my_ss, 0, program)
     relative_base.act()
     assert my_ss.relative_base == 10
 
 
 def test_relative_base_immediate():
+    program = [109, 19]
     my_ss = Intcode()
-    memory = [109, 19]
-    relative_base = RelativeBase(my_ss, 0, memory)
+    my_ss.load_program(program)
+    relative_base = RelativeBase(my_ss, 0, program)
     relative_base.act()
     assert my_ss.relative_base == 19
 
 
 def test_relative_base_relative():
+    program = [209, 0, 69]
     my_ss = Intcode()
+    my_ss.load_program(program)
     my_ss.relative_base = 2
-    memory = [209, 0, 69]
-    relative_base = RelativeBase(my_ss, 0, memory)
+    relative_base = RelativeBase(my_ss, 0, program)
     relative_base.act()
     assert my_ss.relative_base == 69
 
