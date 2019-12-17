@@ -26,16 +26,21 @@ class Instruction(ABC):
     def expected_parameters():
         pass
 
+    def get_memory_position(self, index):
+        mode = self.modes[-1 * (index + 1)]
+        if mode == POSITION_MODE:
+            return self.parameters[index]
+        if mode == RELATIVE_MODE:
+            return self.parameters[index] + self.computer.relative_base
+
     def get_parameter(self, index):
         mode = self.modes[-1 * (index + 1)]
-        parameter = self.parameters[index]
         if mode == POSITION_MODE:
-            return self.memory[parameter]
+            return self.memory[self.get_memory_position(index)]
         elif mode == IMMEDIATE_MODE:
-            return parameter
+            return self.parameters[index]
         elif mode == RELATIVE_MODE:
-            position = self.computer.relative_base + parameter
-            return self.memory[position]
+            return self.memory[self.get_memory_position(index)]
 
     @abstractmethod
     def act(self):
@@ -95,7 +100,7 @@ class Addition(Instruction):
     def act(self):
         arg1 = self.get_parameter(0)
         arg2 = self.get_parameter(1)
-        dest = self.parameters[2] if self.modes[0] == POSITION_MODE else self.computer.relative_base + self.parameters[2]
+        dest = self.get_memory_position(2)
         self.memory[dest] = arg1 + arg2
         return self.advance_pointer()
 
@@ -114,7 +119,7 @@ class Multiplication(Instruction):
     def act(self):
         arg1 = self.get_parameter(0)
         arg2 = self.get_parameter(1)
-        dest = self.parameters[2] if self.modes[0] == POSITION_MODE else self.computer.relative_base + self.parameters[2]
+        dest = self.get_memory_position(2)
         self.memory[dest] = arg1 * arg2
         return self.advance_pointer()
 
@@ -132,7 +137,7 @@ class Input(Instruction):
     
     def act(self):
         value = self.computer.read_input()
-        dest = self.parameters[0] if self.modes[0] == POSITION_MODE else self.computer.relative_base + self.parameters[0]
+        dest = self.get_memory_position(0)
         self.memory[dest] = value
         return self.advance_pointer()
 
@@ -202,7 +207,7 @@ class LessThan(Instruction):
     def act(self):
         arg1 = self.get_parameter(0)
         arg2 = self.get_parameter(1)
-        dest = self.parameters[2] if self.modes[0] == POSITION_MODE else self.computer.relative_base + self.parameters[2]
+        dest = self.get_memory_position(2)
         if arg1 < arg2:
             self.memory[dest] = 1
         else:
@@ -224,7 +229,7 @@ class Equals(Instruction):
     def act(self):
         arg1 = self.get_parameter(0)
         arg2 = self.get_parameter(1)
-        dest = self.parameters[2] if self.modes[0] == POSITION_MODE else self.computer.relative_base + self.parameters[2]
+        dest = self.get_memory_position(2)
         if arg1 == arg2:
             self.memory[dest] = 1
         else:
