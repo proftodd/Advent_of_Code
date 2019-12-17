@@ -8,16 +8,15 @@ RELATIVE_MODE = 2
 
 class Instruction(ABC):
 
-    def __init__(self, computer, instr_ptr):
+    def __init__(self, computer):
         self.computer = computer
-        self.instr_ptr = instr_ptr
-        opcode = self.computer.program[instr_ptr]
+        opcode = self.computer.program[self.computer.instr_ptr]
         modes = list(map(int, str(opcode // 100)))
         while len(modes) < self.expected_parameters():
             modes.insert(0, POSITION_MODE)
         self.modes = modes
         self.modes.reverse()
-        parameter_start = instr_ptr + 1
+        parameter_start = self.computer.instr_ptr + 1
         parameter_end = parameter_start + self.expected_parameters()
         self.parameters = self.computer.program[parameter_start:parameter_end]
 
@@ -47,49 +46,49 @@ class Instruction(ABC):
         pass
 
     def advance_pointer(self):
-        return self.instr_ptr + 1 + self.expected_parameters()
+        self.computer.instr_ptr = self.computer.instr_ptr + 1 + self.expected_parameters()
 
     @staticmethod
-    def create_instruction(ss, instr_ptr):
-        opcode = ss.program[instr_ptr]
+    def create_instruction(ss):
+        opcode = ss.program[ss.instr_ptr]
         instr_code = opcode % 100
         if instr_code == 99:
-            return Stop(ss, instr_ptr)
+            return Stop(ss)
         elif instr_code == 1:
-            return Addition(ss, instr_ptr)
+            return Addition(ss)
         elif instr_code == 2:
-            return Multiplication(ss, instr_ptr)
+            return Multiplication(ss)
         elif instr_code == 3:
-            return Input(ss, instr_ptr)
+            return Input(ss)
         elif instr_code == 4:
-            return Output(ss, instr_ptr)
+            return Output(ss)
         elif instr_code == 5:
-            return JumpIfTrue(ss, instr_ptr)
+            return JumpIfTrue(ss)
         elif instr_code == 6:
-            return JumpIfFalse(ss, instr_ptr)
+            return JumpIfFalse(ss)
         elif instr_code == 7:
-            return LessThan(ss, instr_ptr)
+            return LessThan(ss)
         elif instr_code == 8:
-            return Equals(ss, instr_ptr)
+            return Equals(ss)
 
 
 class Stop(Instruction):
 
-    def __init__(self, ss, instr_ptr):
-        super(Stop, self).__init__(ss, instr_ptr)
+    def __init__(self, ss):
+        super(Stop, self).__init__(ss)
 
     @staticmethod
     def expected_parameters():
         return 0
 
     def act(self):
-        return -1
+        self.computer.instr_ptr = -1
 
 
 class Addition(Instruction):
 
-    def __init__(self, ss, instr_ptr):
-        super(Addition, self).__init__(ss, instr_ptr)
+    def __init__(self, ss):
+        super(Addition, self).__init__(ss)
         if self.modes[2] == IMMEDIATE_MODE:
             raise ValueError('Addition cannot have a destination parameter in IMMEDIATE mode')
 
@@ -102,13 +101,13 @@ class Addition(Instruction):
         arg2 = self.get_parameter(1)
         dest = self.get_memory_position(2)
         self.computer.write_memory(dest, arg1 + arg2)
-        return self.advance_pointer()
+        self.advance_pointer()
 
 
 class Multiplication(Instruction):
 
-    def __init__(self, ss, instr_ptr):
-        super(Multiplication, self).__init__(ss, instr_ptr)
+    def __init__(self, ss):
+        super(Multiplication, self).__init__(ss)
         if self.modes[2] == IMMEDIATE_MODE:
             raise ValueError('Multiplication cannot have a destination parameter in IMMEDIATE mode')
 
@@ -121,13 +120,13 @@ class Multiplication(Instruction):
         arg2 = self.get_parameter(1)
         dest = self.get_memory_position(2)
         self.computer.write_memory(dest, arg1 * arg2)
-        return self.advance_pointer()
+        self.advance_pointer()
 
 
 class Input(Instruction):
 
-    def __init__(self, ss, instr_ptr):
-        super(Input, self).__init__(ss, instr_ptr)
+    def __init__(self, ss):
+        super(Input, self).__init__(ss)
         if self.modes[0] == IMMEDIATE_MODE:
             raise ValueError('Input cannot have a destination parameter in IMMEDIATE mode')
 
@@ -139,13 +138,13 @@ class Input(Instruction):
         value = self.computer.read_input()
         dest = self.get_memory_position(0)
         self.computer.write_memory(dest, value)
-        return self.advance_pointer()
+        self.advance_pointer()
 
 
 class Output(Instruction):
 
-    def __init__(self, ss, instr_ptr):
-        super(Output, self).__init__(ss, instr_ptr)
+    def __init__(self, ss):
+        super(Output, self).__init__(ss)
 
     @staticmethod
     def expected_parameters():
@@ -154,13 +153,13 @@ class Output(Instruction):
     def act(self):
         value = self.get_parameter(0)
         self.computer.write_output(value)
-        return self.advance_pointer()
+        self.advance_pointer()
 
 
 class JumpIfTrue(Instruction):
 
-    def __init__(self, ss, instr_ptr):
-        super(JumpIfTrue, self).__init__(ss, instr_ptr)
+    def __init__(self, ss):
+        super(JumpIfTrue, self).__init__(ss)
 
     @staticmethod
     def expected_parameters():
@@ -170,15 +169,15 @@ class JumpIfTrue(Instruction):
         condition =   self.get_parameter(0)
         destination = self.get_parameter(1)
         if condition:
-            return destination
+            self.computer.instr_ptr = destination
         else:
-            return self.advance_pointer()
+            self.advance_pointer()
 
 
 class JumpIfFalse(Instruction):
 
-    def __init__(self, ss, instr_ptr):
-        super(JumpIfFalse, self).__init__(ss, instr_ptr)
+    def __init__(self, ss):
+        super(JumpIfFalse, self).__init__(ss)
 
     @staticmethod
     def expected_parameters():
@@ -188,15 +187,15 @@ class JumpIfFalse(Instruction):
         condition =   self.get_parameter(0)
         destination = self.get_parameter(1)
         if condition:
-            return self.advance_pointer()
+            self.advance_pointer()
         else:
-            return destination
+            self.computer.instr_ptr = destination
 
 
 class LessThan(Instruction):
 
-    def __init__(self, ss, instr_ptr):
-        super(LessThan, self).__init__(ss, instr_ptr)
+    def __init__(self, ss):
+        super(LessThan, self).__init__(ss)
         if self.modes[2] == IMMEDIATE_MODE:
             raise ValueError('LessThan cannot have a destination parameter in IMMEDIATE mode')
 
@@ -212,13 +211,13 @@ class LessThan(Instruction):
             self.computer.write_memory(dest, 1)
         else:
             self.computer.write_memory(dest, 0)
-        return self.advance_pointer()
+        self.advance_pointer()
 
 
 class Equals(Instruction):
 
-    def __init__(self, ss, instr_ptr):
-        super(Equals, self).__init__(ss, instr_ptr)
+    def __init__(self, ss):
+        super(Equals, self).__init__(ss)
         if self.modes[2] == IMMEDIATE_MODE:
             raise ValueError('LessThan cannot have a destination parameter in IMMEDIATE mode')
 
@@ -234,13 +233,13 @@ class Equals(Instruction):
             self.computer.write_memory(dest, 1)
         else:
             self.computer.write_memory(dest, 0)
-        return self.advance_pointer()
+        self.advance_pointer()
 
 
 class RelativeBase(Instruction):
 
-    def __init__(self, ss, instr_ptr):
-        super(RelativeBase, self).__init__(ss, instr_ptr)
+    def __init__(self, ss):
+        super(RelativeBase, self).__init__(ss)
 
     @staticmethod
     def expected_parameters():
@@ -249,7 +248,7 @@ class RelativeBase(Instruction):
     def act(self):
         arg = self.get_parameter(0)
         self.computer.relative_base = arg
-        return self.advance_pointer()
+        self.advance_pointer()
 
 
 class Intcode:
@@ -257,6 +256,7 @@ class Intcode:
     def __init__(self, input_device=None, output_device=None):
         self.program = []
         self.memory = {}
+        self.instr_ptr = 0
         self.relative_base = 0
         self.input_device = input_device
         self.output_device = output_device
@@ -272,10 +272,10 @@ class Intcode:
         self.program = program
 
     def run_program(self):
-        instr_ptr = 0
-        while instr_ptr >= 0:
-            current_instr = Instruction.create_instruction(self, instr_ptr)
-            instr_ptr = current_instr.act()
+        self.instr_ptr = 0
+        while self.instr_ptr >= 0:
+            current_instr = Instruction.create_instruction(self)
+            current_instr.act()
 
     def read_memory(self, position):
         if position < len(self.program):
