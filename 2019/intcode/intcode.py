@@ -17,6 +17,7 @@ class Instruction(ABC):
         while len(modes) < self.expected_parameters():
             modes.insert(0, POSITION_MODE)
         self.modes = modes
+        self.modes.reverse()
         parameter_start = instr_ptr + 1
         parameter_end = parameter_start + self.expected_parameters()
         self.parameters = memory[parameter_start:parameter_end]
@@ -27,14 +28,14 @@ class Instruction(ABC):
         pass
 
     def get_memory_position(self, index):
-        mode = self.modes[-1 * (index + 1)]
+        mode = self.modes[index]
         if mode == POSITION_MODE:
             return self.parameters[index]
         if mode == RELATIVE_MODE:
             return self.parameters[index] + self.computer.relative_base
 
     def get_parameter(self, index):
-        mode = self.modes[-1 * (index + 1)]
+        mode = self.modes[index]
         if mode == POSITION_MODE:
             return self.memory[self.get_memory_position(index)]
         elif mode == IMMEDIATE_MODE:
@@ -90,7 +91,7 @@ class Addition(Instruction):
 
     def __init__(self, ss, instr_ptr, memory):
         super(Addition, self).__init__(ss, instr_ptr, memory)
-        if self.modes[0] == IMMEDIATE_MODE:
+        if self.modes[2] == IMMEDIATE_MODE:
             raise ValueError('Addition cannot have a destination parameter in IMMEDIATE mode')
 
     @staticmethod
@@ -109,7 +110,7 @@ class Multiplication(Instruction):
 
     def __init__(self, ss, instr_ptr, memory):
         super(Multiplication, self).__init__(ss, instr_ptr, memory)
-        if self.modes[0] == IMMEDIATE_MODE:
+        if self.modes[2] == IMMEDIATE_MODE:
             raise ValueError('Multiplication cannot have a destination parameter in IMMEDIATE mode')
 
     @staticmethod
@@ -197,7 +198,7 @@ class LessThan(Instruction):
 
     def __init__(self, ss, instr_ptr, memory):
         super(LessThan, self).__init__(ss, instr_ptr, memory)
-        if self.modes[0] == IMMEDIATE_MODE:
+        if self.modes[2] == IMMEDIATE_MODE:
             raise ValueError('LessThan cannot have a destination parameter in IMMEDIATE mode')
 
     @staticmethod
@@ -219,7 +220,7 @@ class Equals(Instruction):
 
     def __init__(self, ss, instr_ptr, memory):
         super(Equals, self).__init__(ss, instr_ptr, memory)
-        if self.modes[0] == IMMEDIATE_MODE:
+        if self.modes[2] == IMMEDIATE_MODE:
             raise ValueError('LessThan cannot have a destination parameter in IMMEDIATE mode')
 
     @staticmethod
