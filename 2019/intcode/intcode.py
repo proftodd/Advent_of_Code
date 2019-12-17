@@ -192,6 +192,8 @@ class LessThan(Instruction):
 
     def __init__(self, ss, instr_ptr, memory):
         super(LessThan, self).__init__(ss, instr_ptr, memory)
+        if self.modes[0] == IMMEDIATE_MODE:
+            raise ValueError('LessThan cannot have a destination parameter in IMMEDIATE mode')
 
     @staticmethod
     def expected_parameters():
@@ -200,7 +202,7 @@ class LessThan(Instruction):
     def act(self):
         arg1 = self.get_parameter(0)
         arg2 = self.get_parameter(1)
-        dest = self.parameters[2]
+        dest = self.parameters[2] if self.modes[0] == POSITION_MODE else self.computer.relative_base + self.parameters[2]
         if arg1 < arg2:
             self.memory[dest] = 1
         else:
@@ -212,6 +214,8 @@ class Equals(Instruction):
 
     def __init__(self, ss, instr_ptr, memory):
         super(Equals, self).__init__(ss, instr_ptr, memory)
+        if self.modes[0] == IMMEDIATE_MODE:
+            raise ValueError('LessThan cannot have a destination parameter in IMMEDIATE mode')
 
     @staticmethod
     def expected_parameters():
@@ -220,7 +224,7 @@ class Equals(Instruction):
     def act(self):
         arg1 = self.get_parameter(0)
         arg2 = self.get_parameter(1)
-        dest = self.parameters[2]
+        dest = self.parameters[2] if self.modes[0] == POSITION_MODE else self.computer.relative_base + self.parameters[2]
         if arg1 == arg2:
             self.memory[dest] = 1
         else:

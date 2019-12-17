@@ -84,8 +84,8 @@ def test_multiplication_relative_mode():
     my_ss = Intcode()
     my_ss.relative_base = 4
     memory = [22202, 0, 1, 2, 1, 2, 0]
-    adder = Multiplication(my_ss, 0, memory)
-    adder.act()
+    multiplier = Multiplication(my_ss, 0, memory)
+    multiplier.act()
     assert memory == [22202, 0, 1, 2, 1, 2, 2]
 
 
@@ -229,6 +229,27 @@ def test_less_than_immediate():
     assert memory_2 == [1107, 3, 2, 4, 0]
 
 
+def test_less_than_cannot_have_destination_parameter_in_IMMEDIATE_mode():
+    try:
+        LessThan(ss, 0, [11107, 1, 2, 4, 0])
+        assert False
+    except ValueError:
+        assert True
+
+
+def test_less_than_relative_mode():
+    my_ss = Intcode()
+    my_ss.relative_base = 4
+    memory = [22207, 0, 1, 2, 1, 2, -1]
+    lt_true = LessThan(my_ss, 0, memory)
+    lt_true.act()
+    assert memory == [22207, 0, 1, 2, 1, 2, 1]
+    memory = [22207, 0, 1, 2, 3, 2, -1]
+    lt_false = LessThan(my_ss, 0, memory)
+    lt_false.act()
+    assert memory == [22207, 0, 1, 2, 3, 2, 0]
+
+
 def test_equal_position():
     memory_1 = [8, 0, 2, 4, 0]
     less_than_true = Equals(ss, 0, memory_1)
@@ -255,6 +276,27 @@ def test_equal_immediate():
     assert memory_2 == [1108, 2, 2, 4, 1]
 
 
+def test_equals_cannot_have_destination_parameter_in_IMMEDIATE_mode():
+    try:
+        Equals(ss, 0, [11108, 1, 2, 4, 0])
+        assert False
+    except ValueError:
+        assert True
+
+
+def test_equals_relative_mode():
+    my_ss = Intcode()
+    my_ss.relative_base = 4
+    memory = [22208, 0, 1, 2, 1, 1, -1]
+    eq_true = Equals(my_ss, 0, memory)
+    eq_true.act()
+    assert memory == [22208, 0, 1, 2, 1, 1, 1]
+    memory = [22208, 0, 1, 2, 3, 2, -1]
+    eq_false = Equals(my_ss, 0, memory)
+    eq_false.act()
+    assert memory == [22208, 0, 1, 2, 3, 2, 0]
+
+
 def test_relative_base_position():
     my_ss = Intcode()
     memory = [9, 2, 10]
@@ -265,10 +307,19 @@ def test_relative_base_position():
 
 def test_relative_base_immediate():
     my_ss = Intcode()
-    memory = [1109, 19]
+    memory = [109, 19]
     relative_base = RelativeBase(my_ss, 0, memory)
     relative_base.act()
     assert my_ss.relative_base == 19
+
+
+def test_relative_base_relative():
+    my_ss = Intcode()
+    my_ss.relative_base = 2
+    memory = [209, 0, 69]
+    relative_base = RelativeBase(my_ss, 0, memory)
+    relative_base.act()
+    assert my_ss.relative_base == 69
 
 
 def test_day_02_example_00():
