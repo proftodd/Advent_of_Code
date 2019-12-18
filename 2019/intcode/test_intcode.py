@@ -365,31 +365,33 @@ def test_equals_relative_mode():
 
 
 def test_relative_base_position():
-    program = [9, 2, 10]
+    program = [9, 2, -7]
     ss = Intcode()
+    ss.relative_base = 10
     ss.load_program(program)
     relative_base = RelativeBase(ss)
     relative_base.act()
-    assert ss.relative_base == 10
+    assert ss.relative_base == 3
 
 
 def test_relative_base_immediate():
     program = [109, 19]
     ss = Intcode()
+    ss.relative_base = 5
     ss.load_program(program)
     relative_base = RelativeBase(ss)
     relative_base.act()
-    assert ss.relative_base == 19
+    assert ss.relative_base == 24
 
 
 def test_relative_base_relative():
-    program = [209, 0, 69]
+    program = [209, 0, -69]
     ss = Intcode()
+    ss.relative_base = 70
     ss.load_program(program)
-    ss.relative_base = 2
     relative_base = RelativeBase(ss)
     relative_base.act()
-    assert ss.relative_base == 69
+    assert ss.relative_base == 70
 
 
 def test_day_02_example_00():
@@ -615,3 +617,31 @@ def test_day_05_example_08():
     ss_3.load_program(memory)
     ss_3.run_program()
     assert output_buffer_3 == [1001]
+
+
+def test_day_09_example_01():
+    program = [109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99]
+    output_buffer = queue.Queue()
+    ss = Intcode(output_device=output_buffer)
+    ss.load_program(list(program))
+    ss.run_program()
+    for i in range(len(program)):
+        assert output_buffer.get() == program[i]
+
+
+def test_day_09_example_02():
+    program = [1102, 34915192, 34915192, 7, 4, 7, 99, 0]
+    output_buffer = queue.Queue()
+    ss = Intcode(output_device=output_buffer)
+    ss.load_program(program)
+    ss.run_program()
+    assert len(str(output_buffer.get())) == 16
+
+
+def test_day_09_example_03():
+    program = [104, 1125899906842624, 99]
+    output_buffer = queue.Queue()
+    ss = Intcode(output_device=output_buffer)
+    ss.load_program(program)
+    ss.run_program()
+    assert output_buffer.get() == program[1]

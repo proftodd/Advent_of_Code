@@ -14,8 +14,8 @@ class Instruction(ABC):
         modes = list(map(int, str(opcode // 100)))
         while len(modes) < self.expected_parameters():
             modes.insert(0, POSITION_MODE)
+        modes.reverse()
         self.modes = modes
-        self.modes.reverse()
         parameter_start = self.computer.instr_ptr + 1
         parameter_end = parameter_start + self.expected_parameters()
         self.parameters = self.computer.program[parameter_start:parameter_end]
@@ -70,6 +70,8 @@ class Instruction(ABC):
             return LessThan(ss)
         elif instr_code == 8:
             return Equals(ss)
+        elif instr_code == 9:
+            return RelativeBase(ss)
 
 
 class Stop(Instruction):
@@ -247,7 +249,7 @@ class RelativeBase(Instruction):
 
     def act(self):
         arg = self.get_parameter(0)
-        self.computer.relative_base = arg
+        self.computer.relative_base = self.computer.relative_base + arg
         self.advance_pointer()
 
 
@@ -273,6 +275,7 @@ class Intcode:
 
     def run_program(self):
         self.instr_ptr = 0
+        self.relative_base = 0
         while self.instr_ptr >= 0:
             current_instr = Instruction.create_instruction(self)
             current_instr.act()
@@ -281,7 +284,7 @@ class Intcode:
         if position < len(self.program):
             return self.program[position]
         else:
-            return self.memory[position - len(self.program)]
+            return self.memory.get(position - len(self.program), 0)
 
     def write_memory(self, position, value):
         if position < len(self.program):
