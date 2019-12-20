@@ -17,3 +17,4 @@ compile_test: compile_prod
 run_test: compile_test
 	cp src/test/resources/*txt bin
 	java -cp $(CP) org.junit.runner.JUnitCore org.jtodd.aoc.asteroids.TestMonitoringStation
+	java -cp $(CP) org.junit.runner.JUnitCore org.jtodd.aoc.asteroids.TestGeom
