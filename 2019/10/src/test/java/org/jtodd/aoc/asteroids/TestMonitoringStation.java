@@ -2,10 +2,10 @@ package org.jtodd.aoc.asteroids;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +66,7 @@ public class TestMonitoringStation {
 
     @Test
     public void testExample01() throws IOException {
-        String filename = "example_01.txt";
+        String filename = "/example_01.txt";
         Map.Entry<Point2D, Long> best = getBest(filename);
         Assert.assertEquals(3.0, best.getKey().getX(), 1e-6);
         Assert.assertEquals(4.0, best.getKey().getY(), 1e-6);
@@ -75,7 +75,7 @@ public class TestMonitoringStation {
     
     @Test
     public void testExample02() throws IOException {
-        String filename = "example_02.txt";
+        String filename = "/example_02.txt";
         Map.Entry<Point2D, Long> best = getBest(filename);
         Assert.assertEquals(5.0, best.getKey().getX(), 1e-6);
         Assert.assertEquals(8.0, best.getKey().getY(), 1e-6);
@@ -84,7 +84,7 @@ public class TestMonitoringStation {
 
     @Test
     public void testExample03() throws IOException {
-        String filename = "example_03.txt";
+        String filename = "/example_03.txt";
         Map.Entry<Point2D, Long> best = getBest(filename);
         Assert.assertEquals(1.0, best.getKey().getX(), 1e-6);
         Assert.assertEquals(2.0, best.getKey().getY(), 1e-6);
@@ -93,7 +93,7 @@ public class TestMonitoringStation {
 
     @Test
     public void testExample04() throws IOException {
-        String filename = "example_04.txt";
+        String filename = "/example_04.txt";
         Map.Entry<Point2D, Long> best = getBest(filename);
         Assert.assertEquals(6.0, best.getKey().getX(), 1e-6);
         Assert.assertEquals(3.0, best.getKey().getY(), 1e-6);
@@ -102,7 +102,7 @@ public class TestMonitoringStation {
 
     @Test
     public void testExample05() throws IOException {
-        String filename = "example_05.txt";
+        String filename = "/example_05.txt";
         Map.Entry<Point2D, Long> best = getBest(filename);
         Assert.assertEquals(11.0, best.getKey().getX(), 1e-6);
         Assert.assertEquals(13.0, best.getKey().getY(), 1e-6);
@@ -110,8 +110,9 @@ public class TestMonitoringStation {
     }
 
     private static Map.Entry<Point2D, Long> getBest(String filename) throws IOException {
-        Path p = FileSystems.getDefault().getPath(filename);
-        List<String> lines = Files.readAllLines(p);
+        InputStream fileStream = TestMonitoringStation.class.getResourceAsStream(filename);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(fileStream));
+        List<String> lines = reader.lines().collect(Collectors.toList());
         List<Point2D> field = MonitoringStation.getAsteroidField(lines);
         Map<Point2D, Long> scores = field.stream().collect(
             Collectors.toMap(Function.identity(), a -> MonitoringStation.viewableAsteroids(a, field))
