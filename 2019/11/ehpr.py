@@ -1,3 +1,6 @@
+# TODO: I don't know yet if it will work best for
+# TODO: increasing y directions to be up or down
+# TODO: Right now it's coded for UP = decreasing y
 UP = (0, -1)
 RIGHT = (1, 0)
 DOWN = (0, 1)
@@ -11,12 +14,21 @@ colors = [BLACK, WHITE]
 
 class EHPR():
 
-    def __init__(self):
+    def __init__(self, input_buffer, output_buffer):
+        self.input_buffer = input_buffer
+        self.output_buffer = output_buffer
         self.grid = {}
         self.x = 0
         self.y = 0
         self.direction_index = 0
         self.painted_squares = {}
+
+    def act(self):
+        self.output_buffer.put(self.scan_camera())
+        color = self.input_buffer.get()
+        direction = self.input_buffer.get()
+        self.paint(color)
+        self.turn_and_move(direction)
 
     def turn_and_move(self, direction):
         if direction:
