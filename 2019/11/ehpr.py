@@ -11,10 +11,10 @@ colors = [BLACK, WHITE]
 
 class EHPR():
 
-    def __init__(self, x, y):
+    def __init__(self):
         self.grid = {}
-        self.x = x
-        self.y = y
+        self.x = 0
+        self.y = 0
         self.direction_index = 0
         self.painted_squares = {}
 
