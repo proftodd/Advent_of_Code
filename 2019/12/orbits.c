@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,6 +6,14 @@ struct Moon {
     int x, y, z;
     int vel_x, vel_y, vel_z;
 };
+
+char *to_string(struct Moon moon)
+{
+    char *result;
+    const char *format = "pos=<x=%3d, y=%3d, z=%3d>, vel=<x=%3d, y=%3d, z=%3d>";
+    asprintf(&result, format, moon.x, moon.y, moon.z, moon.vel_x, moon.vel_y, moon.vel_z);
+    return result;
+}
 
 void gravity(int moon_count, struct Moon moons[])
 {
@@ -56,7 +63,6 @@ int main(int argc, char **argv)
     const int repetitions = atoi(argv[2]);
 
     FILE *file = fopen(argv[1], "r");
-    assert(file != NULL);
     char current_line[100];
     int moon_count = 0;
     while (fgets(current_line, sizeof(current_line), file) != NULL) {
@@ -75,7 +81,9 @@ int main(int argc, char **argv)
     int i = 0;
     fprintf(stdout, "After %d steps:\n", i);
     for (int j = 0; j < MOON_COUNT; ++j) {
-        fprintf(stdout, "pos=<x=%3d, y=%3d, z=%3d>, vel=<x=%3d, y=%3d, z=%3d>\n", moons[j].x, moons[j].y, moons[j].z, moons[j].vel_x, moons[j].vel_y, moons[j].vel_z);
+        const char *string_rep = to_string(moons[j]);
+        fprintf(stdout, "%s\n", string_rep);
+        free(string_rep);
     }
     while (i < repetitions) {
         ++i;
@@ -83,9 +91,9 @@ int main(int argc, char **argv)
         velocity(MOON_COUNT, moons);
         fprintf(stdout, "After %d steps:\n", i);
         for (int j = 0; j < MOON_COUNT; ++j) {
-            fprintf(stdout, "pos=<x=%3d, y=%3d, z=%3d>, vel=<x=%3d, y=%3d, z=%3d>\n",
-                moons[j].x, moons[j].y, moons[j].z, moons[j].vel_x, moons[j].vel_y, moons[j].vel_z
-            );
+            const char *string_rep = to_string(moons[j]);
+            fprintf(stdout, "%s\n", string_rep);
+            free(string_rep);
         }
         if (i % 10 == 0) {
             fprintf(stdout, "Energy after %d steps:\n", i);

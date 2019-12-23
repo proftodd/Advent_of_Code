@@ -132,6 +132,10 @@ dmypy.json
 *.class
 bin
 
+# C
+a.out
+*.o
+
 # IDE
 .idea
 .vscode
