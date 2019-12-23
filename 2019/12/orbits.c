@@ -26,13 +26,13 @@ int main(int argc, char **argv)
             int total_energies[moon_count];
             int total_energy = 0;
             for (int j = 0; j < moon_count; ++j) {
-                int pot = abs(moons[j]->x)     + abs(moons[j]->y)     + abs(moons[j]->z);
-                int kin = abs(moons[j]->vel_x) + abs(moons[j]->vel_y) + abs(moons[j]->vel_z);
+                int pot = abs(moons[j]->coord[0])    + abs(moons[j]->coord[1])    + abs(moons[j]->coord[2]);
+                int kin = abs(moons[j]->velocity[0]) + abs(moons[j]->velocity[1]) + abs(moons[j]->velocity[2]);
                 total_energies[j] = pot * kin;
                 total_energy += total_energies[j];
                 fprintf(stdout, "pot: %3d + %3d + %3d = %3d;    kin: %3d + %3d + %3d = %3d;    toal: %3d * %3d = %3d\n",
-                    abs(moons[j]->x),     abs(moons[j]->y),     abs(moons[j]->z),     pot,
-                    abs(moons[j]->vel_x), abs(moons[j]->vel_y), abs(moons[j]->vel_z), kin,
+                    abs(moons[j]->coord[0]),    abs(moons[j]->coord[1]),    abs(moons[j]->coord[2]),    pot,
+                    abs(moons[j]->velocity[0]), abs(moons[j]->velocity[1]), abs(moons[j]->velocity[2]), kin,
                     pot, kin, pot * kin
                 );
             }

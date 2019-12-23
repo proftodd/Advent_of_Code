@@ -1,8 +1,8 @@
 #include <string.h>
 
 struct Moon {
-    int x, y, z;
-    int vel_x, vel_y, vel_z;
+    int coord[3];
+    int velocity[3];
 };
 
 struct Moon **read_system(const char *filename, int *number)
@@ -24,12 +24,12 @@ struct Moon **read_system(const char *filename, int *number)
     while (fgets(current_line, sizeof(current_line), file) != NULL) {
         sscanf(current_line, format, &x, &y, &z);
         struct Moon *new_moon = malloc(sizeof(struct Moon));
-        new_moon->x = x;
-        new_moon->y = y;
-        new_moon->z = z;
-        new_moon->vel_x = 0;
-        new_moon->vel_y = 0;
-        new_moon->vel_z = 0;
+        new_moon->coord[0] = x;
+        new_moon->coord[1] = y;
+        new_moon->coord[2] = z;
+        new_moon->velocity[0] = 0;
+        new_moon->velocity[1] = 0;
+        new_moon->velocity[2] = 0;
         moons[count] = new_moon;
         ++count;
     }
@@ -41,7 +41,7 @@ static char *to_string(struct Moon *moon)
 {
     char *result;
     const char *format = "pos=<x=%3d, y=%3d, z=%3d>, vel=<x=%3d, y=%3d, z=%3d>";
-    asprintf(&result, format, moon->x, moon->y, moon->z, moon->vel_x, moon->vel_y, moon->vel_z);
+    asprintf(&result, format, moon->coord[0], moon->coord[1], moon->coord[2], moon->velocity[0], moon->velocity[1], moon->velocity[2]);
     return result;
 }
 
@@ -65,26 +65,14 @@ void gravity(int moon_count, struct Moon *moons[])
 {
     for (int i = 0; i < moon_count; ++i) {
         for (int j = i + 1; j < moon_count; ++j) {
-            if (moons[i]->x < moons[j]->x) {
-                ++moons[i]->vel_x;
-                --moons[j]->vel_x;
-            } else if (moons[i]->x > moons[j]->x) {
-                --moons[i]->vel_x;
-                ++moons[j]->vel_x;
-            }
-            if (moons[i]->y < moons[j]->y) {
-                ++moons[i]->vel_y;
-                --moons[j]->vel_y;
-            } else if (moons[i]->y > moons[j]->y) {
-                --moons[i]->vel_y;
-                ++moons[j]->vel_y;
-            }
-            if (moons[i]->z < moons[j]->z) {
-                ++moons[i]->vel_z;
-                --moons[j]->vel_z;
-            } else if (moons[i]->z > moons[j]->z) {
-                --moons[i]->vel_z;
-                ++moons[j]->vel_z;
+            for (int k = 0; k < 3; ++k) {
+                if (moons[i]->coord[k] < moons[j]->coord[k]) {
+                    ++moons[i]->velocity[k];
+                    --moons[j]->velocity[k];
+                } else if (moons[i]->coord[k] > moons[j]->coord[k]) {
+                    --moons[i]->velocity[k];
+                    ++moons[j]->velocity[k];
+                }
             }
         }
     }
@@ -93,8 +81,9 @@ void gravity(int moon_count, struct Moon *moons[])
 void velocity(int moon_count, struct Moon *moons[])
 {
     for (int i = 0; i < moon_count; ++i) {
-        moons[i]->x += moons[i]->vel_x;
-        moons[i]->y += moons[i]->vel_y;
-        moons[i]->z += moons[i]->vel_z;
+        for (int k = 0; k < 3; ++k) {
+            moons[i]->coord[k] += moons[i]->velocity[k];
+
+        }
     }
 }
