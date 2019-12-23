@@ -15,6 +15,20 @@ char *to_string(struct Moon moon)
     return result;
 }
 
+char *to_string_system(int moon_count, struct Moon moons[])
+{
+    char *result;
+    char *this_moon = to_string(moons[0]);
+    asprintf(&result, "%s", this_moon);
+    free(this_moon);
+    for (int i = 1; i < moon_count; ++i) {
+        char *this_moon = to_string(moons[i]);
+        asprintf(&result, "%s\n%s", result, this_moon);
+        free(this_moon);
+    }
+    return result;
+}
+
 void gravity(int moon_count, struct Moon moons[])
 {
     for (int i = 0; i < moon_count; ++i) {
@@ -80,21 +94,17 @@ int main(int argc, char **argv)
 
     int i = 0;
     fprintf(stdout, "After %d steps:\n", i);
-    for (int j = 0; j < MOON_COUNT; ++j) {
-        const char *string_rep = to_string(moons[j]);
-        fprintf(stdout, "%s\n", string_rep);
-        free(string_rep);
-    }
+    char *this_step = to_string_system(MOON_COUNT, moons);
+    fprintf(stdout, "%s\n\n", this_step);
+    free(this_step);
     while (i < repetitions) {
         ++i;
         gravity(MOON_COUNT, moons);
         velocity(MOON_COUNT, moons);
         fprintf(stdout, "After %d steps:\n", i);
-        for (int j = 0; j < MOON_COUNT; ++j) {
-            const char *string_rep = to_string(moons[j]);
-            fprintf(stdout, "%s\n", string_rep);
-            free(string_rep);
-        }
+        char *this_step = to_string_system(MOON_COUNT, moons);
+        fprintf(stdout, "%s\n", this_step);
+        free(this_step);
         if (i % 10 == 0) {
             fprintf(stdout, "Energy after %d steps:\n", i);
             int total_energies[MOON_COUNT];
