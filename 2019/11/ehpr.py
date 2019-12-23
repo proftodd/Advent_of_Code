@@ -19,10 +19,10 @@ colors = [BLACK, WHITE]
 
 class EHPR():
 
-    def __init__(self, input_buffer, output_buffer):
+    def __init__(self, input_buffer, output_buffer, grid=None):
         self.input_buffer = input_buffer
         self.output_buffer = output_buffer
-        self.grid = {}
+        self.grid = grid if grid else {}
         self.x = 0
         self.y = 0
         self.direction_index = 0
@@ -48,7 +48,7 @@ class EHPR():
 
     def paint(self, color):
         self.grid[(self.x, self.y)] = color
-        self.painted_squares[(self.y, self.x)] = self.painted_squares.get((self.y, self.x), 0) + 1
+        self.painted_squares[(self.x, self.y)] = self.painted_squares.get((self.x, self.y), 0) + 1
 
     def run(self):
         try:
@@ -60,9 +60,13 @@ class EHPR():
 
 if __name__ == '__main__':
     program = Intcode.read_program(sys.argv[1])
+    grid = {}
+    if len(sys.argv) > 2:
+        for i in range(2, len(sys.argv), 3):
+            grid[int(sys.argv[i]), int(sys.argv[i + 1])] = int(sys.argv[i + 2])
     control = Queue()
     sensors = Queue()
-    ehpr = EHPR(input_buffer=control, output_buffer=sensors)
+    ehpr = EHPR(input_buffer=control, output_buffer=sensors, grid=grid)
     ss = Intcode(input_device=sensors, output_device=control)
     ss.load_program(program)
     ehpr_thread = Thread(target=ehpr.run, name="EHPR")
@@ -71,3 +75,21 @@ if __name__ == '__main__':
     ehpr_thread.start()
     intcode_thread.join()
     print(f"{len(ehpr.painted_squares)} squares painted")
+    minx = 0
+    maxx = 0
+    miny = 0
+    maxy = 0
+    for x, y in ehpr.grid:
+        if x < minx:
+            minx = x
+        if x > maxx:
+            maxx = x
+        if y < miny:
+            miny = y
+        if y > maxy:
+            maxy = y
+    for y in range(miny, maxy + 1):
+        for x in range(minx, maxx + 1):
+            char_to_print = '#' if ehpr.grid.get((x, y), 0) else '.'
+            print(char_to_print, end='')
+        print()
