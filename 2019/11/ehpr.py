@@ -1,5 +1,5 @@
 import sys
-from queue import Queue
+from queue import Empty, Queue
 from threading import Thread
 from intcode.intcode import Intcode
 
@@ -51,11 +51,14 @@ class EHPR():
         self.painted_squares[(self.y, self.x)] = self.painted_squares.get((self.y, self.x), 0) + 1
 
     def run(self):
-        while True:
-            self.act()
+        try:
+            while True:
+                self.act()
+        except Empty:
+            exit(0)
 
 
-def main():
+if __name__ == '__main__':
     program = Intcode.read_program(sys.argv[1])
     control = Queue()
     sensors = Queue()
@@ -68,7 +71,3 @@ def main():
     ehpr_thread.start()
     intcode_thread.join()
     print(f"{len(ehpr.painted_squares)} squares painted")
-
-
-if __name__ == '__main__':
-    main()

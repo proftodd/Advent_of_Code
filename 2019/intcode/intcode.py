@@ -1,3 +1,4 @@
+import sys
 from abc import ABC, abstractmethod
 from queue import Queue
 
@@ -314,3 +315,10 @@ class Intcode:
 
     def write_program(self):
         print(','.join([str(i) for i in self.program]))
+
+
+if __name__ == '__main__':
+    program = Intcode.read_program(sys.argv[1])
+    ss = Intcode()
+    ss.load_program(program)
+    ss.run_program()
