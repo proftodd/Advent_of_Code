@@ -1,3 +1,8 @@
+import sys
+from queue import Queue
+from threading import Thread
+from intcode.intcode import Intcode
+
 # TODO: I don't know yet if it will work best for
 # TODO: increasing y directions to be up or down
 # TODO: Right now it's coded for UP = decreasing y
@@ -48,3 +53,22 @@ class EHPR():
     def run(self):
         while True:
             self.act()
+
+
+def main():
+    program = Intcode.read_program(sys.argv[1])
+    control = Queue()
+    sensors = Queue()
+    ehpr = EHPR(input_buffer=control, output_buffer=sensors)
+    ss = Intcode(input_device=sensors, output_device=control)
+    ss.load_program(program)
+    ehpr_thread = Thread(target=ehpr.run, name="EHPR")
+    intcode_thread = Thread(target=ss.run_program, name="Intcode")
+    intcode_thread.start()
+    ehpr_thread.start()
+    intcode_thread.join()
+    print(f"{len(ehpr.painted_squares)} squares painted")
+
+
+if __name__ == '__main__':
+    main()
