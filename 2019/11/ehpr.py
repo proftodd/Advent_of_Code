@@ -25,8 +25,8 @@ class EHPR():
 
     def act(self):
         self.output_buffer.put(self.scan_camera())
-        color = self.input_buffer.get()
-        direction = self.input_buffer.get()
+        color = self.input_buffer.get(timeout=5)
+        direction = self.input_buffer.get(timeout=5)
         self.paint(color)
         self.turn_and_move(direction)
 
@@ -44,3 +44,7 @@ class EHPR():
     def paint(self, color):
         self.grid[(self.x, self.y)] = color
         self.painted_squares[(self.y, self.x)] = self.painted_squares.get((self.y, self.x), 0) + 1
+
+    def run(self):
+        while True:
+            self.act()
