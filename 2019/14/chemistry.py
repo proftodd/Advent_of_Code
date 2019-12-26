@@ -29,3 +29,20 @@ class Reaction:
         new_rcts = {rct: self.rcts[rct] for rct in self.rcts}
         new_rcts[rct] = self.rcts.get(rct, 0) + coefficient
         return Reaction(new_rcts, self.prd)
+
+    def multiply_by(self, factor):
+        new_rcts = {rct: factor * self.rcts[rct] for rct in self.rcts}
+        new_prd = (self.prd[0], self.prd[1] * factor)
+        return Reaction(new_rcts, new_prd)
+
+    def complex_substitute(self, other):
+        if self.rcts[other.prd[0]] % other.prd[1] == 0:
+            factor = self.rcts[other.prd[0]] // other.prd[1]
+            new_other = other.multiply_by(factor)
+            return self.substitute(new_other)
+        else:
+            factor = self.rcts[other.prd[0]] // other.prd[1] + 1
+            new_other = other.multiply_by(factor)
+            difference = new_other.prd[1] - self.rcts[new_other.prd[0]]
+            new_me = self.add_term(new_other.prd[0], difference)
+            return new_me.substitute(new_other)

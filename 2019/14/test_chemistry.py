@@ -27,3 +27,13 @@ def test_add_term():
     assert new_r.rcts['A'] == 30
     newer_r = r.add_term('C', 5)
     assert newer_r.rcts['C'] == 5
+
+
+def test_complex_substitute():
+    r1 = Reaction({'A': 10, 'B': 24, 'C': 37}, ('FUEL', 1))
+    r2 = Reaction({'ORE': 8}, ('B', 3))
+    r3 = Reaction({'ORE': 7}, ('C', 5))
+    new_r1 = r1.complex_substitute(r2)
+    assert new_r1.rcts['ORE'] == 64
+    new_r2 = r1.complex_substitute(r3)
+    assert new_r2.rcts['ORE'] == 56
