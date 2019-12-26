@@ -8,7 +8,7 @@ from threading import Thread
 
 def try_permutation(program, perm):
     labels = 'ABCDE'
-    io_buffers = [Queue()] * len(perm)
+    io_buffers = [Queue() for i in range(len(perm))]
     threads = []
     for i in range(len(perm)):
         ss = intcode.intcode.Intcode(io_buffers[i], io_buffers[(i + 1) % len(perm)])
@@ -16,7 +16,7 @@ def try_permutation(program, perm):
         io_buffers[i].put(perm[i])
         if i == 0:
             io_buffers[i].put(0)
-        threads.append(Thread(target=ss.run_program, name=f"Intcode-{labels[i]}"))
+        threads.append(Thread(target=ss.run_program, name=f"Amp {labels[i]}"))
         threads[i].start()
 
     for t in threads:
