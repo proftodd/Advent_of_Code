@@ -1,8 +1,10 @@
 #include <string.h>
 
+const int DIMENSIONS = 3;
+
 struct Moon {
-    int coord[3];
-    int velocity[3];
+    int coord[DIMENSIONS];
+    int velocity[DIMENSIONS];
 };
 
 struct Moon **read_system(const char *filename, int *number)
@@ -27,9 +29,9 @@ struct Moon **read_system(const char *filename, int *number)
         new_moon->coord[0] = x;
         new_moon->coord[1] = y;
         new_moon->coord[2] = z;
-        new_moon->velocity[0] = 0;
-        new_moon->velocity[1] = 0;
-        new_moon->velocity[2] = 0;
+        for (int i = 0; i < DIMENSIONS; ++i) {
+            new_moon->velocity[i] = 0;
+        }
         moons[count] = new_moon;
         ++count;
     }
@@ -61,11 +63,23 @@ char *to_string_system(int moon_count, struct Moon *moons[])
     return result;
 }
 
+char *to_vector_matrix(int moon_count, struct Moon *moons[], const int axis)
+{
+    char *result, *old_result;
+    asprintf(&result, "pos=%3d, vel=%3d", moons[0]->coord[axis], moons[0]->velocity[axis]);
+    for (int i = 1; i < moon_count; ++i) {
+        old_result = result;
+        asprintf(&result, "%s; pos=%3d, vel=%3d", old_result, moons[i]->coord[axis], moons[i]->velocity[axis]);
+        free(old_result);
+    }
+    return result;
+}
+
 void gravity(int moon_count, struct Moon *moons[])
 {
     for (int i = 0; i < moon_count; ++i) {
         for (int j = i + 1; j < moon_count; ++j) {
-            for (int k = 0; k < 3; ++k) {
+            for (int k = 0; k < DIMENSIONS; ++k) {
                 if (moons[i]->coord[k] < moons[j]->coord[k]) {
                     ++moons[i]->velocity[k];
                     --moons[j]->velocity[k];
@@ -81,9 +95,8 @@ void gravity(int moon_count, struct Moon *moons[])
 void velocity(int moon_count, struct Moon *moons[])
 {
     for (int i = 0; i < moon_count; ++i) {
-        for (int k = 0; k < 3; ++k) {
+        for (int k = 0; k < DIMENSIONS; ++k) {
             moons[i]->coord[k] += moons[i]->velocity[k];
-
         }
     }
 }
