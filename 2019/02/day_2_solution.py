@@ -1,6 +1,7 @@
 import sys
 import intcode.intcode
 
+
 def main():
     ss = intcode.intcode.Intcode()
     input_file = sys.argv[1]
@@ -11,7 +12,7 @@ def main():
     ss.load_program(program)
     ss.run_program()
     print(f"Writing results to stdout")
-    ss.write_memory()
+    ss.write_program()
 
 
 if __name__ == '__main__':
