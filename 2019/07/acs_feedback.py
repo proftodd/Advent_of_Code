@@ -17,7 +17,9 @@ def try_permutation(program, perm):
         if i == 0:
             io_buffers[i].put(0)
         threads.append(Thread(target=ss.run_program, name=f"Amp {labels[i]}"))
-        threads[i].start()
+
+    for t in threads:
+        t.start()
 
     for t in threads:
         t.join()
