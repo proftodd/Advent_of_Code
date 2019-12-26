@@ -1,0 +1,41 @@
+EXAMPLE 1
+10 ORE => 10 A
+1 ORE => 1 B
+7 A, 1 B => 1 C
+7 A, 1 C => 1 D
+7 A, 1 D => 1 E
+7 A, 1 E => 1 FUEL
+
+SIMPLIFICATION
+7 A, 1 E => 1 FUEL (Pick input equation with FUEL as product)
+7A, 7A, 1D => 1 FUEL (Substitute)
+14A, 1D => 1 FUEL (Combine terms)
+14A, 7A, 1C => 1 FUEL (Substitute)
+21A, 1C => 1 FUEL (Combine terms)
+21A, 7A, 1B => 1 FUEL (Substitute)
+28A, 1B => 1 FUEL (Combine terms)
+30A, 1B => 1 FUEL + 2A (Add)
+3(10A), 1B => 1 FUEL + 2A (Factor)
+3(10ORE), 1B => 1 FUEL + 2A (Substitute)
+30 ORE, 1 ORE => 1 FUEL + 2A (Distribute)
+31 ORE => 1 FUEL + 2A (Combine terms)
+
+EXAMPLE 2
+9 ORE => 2 A
+8 ORE => 3 B
+7 ORE => 5 C
+3 A, 4 B => 1 AB
+5 B, 7 C => 1 BC
+4 C, 1 A => 1 CA
+2 AB, 3 BC, 4 CA => 1 FUEL
+
+SIMPLIFICATION
+2AB, 3BC, 4CA => 1 FUEL (Pick input equation with FUEL as product)
+2(3A, 4B), 3(5B, 7C), 4(4C, 1A) => 1 FUEL (Substitute)
+6A, 8B, 15B, 21C, 16C, 4A => 1 FUEL (Distribute)
+10A, 23B, 37C => 1 FUEL (Combine terms)
+10A, 24B, 40C => 1 FUEL + 1B + 3C (Add)
+5(2A) + 8(3B) + 8(5C) => 1 FUEL + 1B + 3C (Factor)
+5(9ORE) + 8(8ORE) + 8(7ORE) => 1 FUEL + 1B + 3C (Substitute)
+45ORE + 64ORE + 56ORE => 1 FUEL + 1B + 3C (Distribute)
+165ORE => 1 FUEL + 1B + 3C (Combine terms)
