@@ -106,19 +106,9 @@ def test_multiplication_relative_mode():
 
 def test_input():
     program = [4, 2, 0]
-    ss = Intcode(input_device=['42'])
-    ss.load_program(program)
-    input_instruction = Input(ss)
-    input_instruction.act()
-    assert ss.instr_ptr == 2
-    assert ss.read_memory(2) == 42
-
-
-def test_input_queue():
-    program = [4, 2, 0]
-    q = queue.Queue()
-    q.put('42')
-    ss = Intcode(input_device=q)
+    input_buffer = queue.Queue()
+    input_buffer.put(42)
+    ss = Intcode(input_device=input_buffer)
     ss.load_program(program)
     input_instruction = Input(ss)
     input_instruction.act()
@@ -150,36 +140,24 @@ def test_input_relative():
 
 def test_output_position():
     program = [5, 2, 69]
-    output_buffer = []
+    output_buffer = queue.Queue()
     ss = Intcode(output_device=output_buffer)
     ss.load_program(program)
     output_instruction = Output(ss)
     output_instruction.act()
     assert ss.instr_ptr == 2
-    assert output_buffer == [69]
+    assert output_buffer.get() == 69
 
 
 def test_output_immediate():
     program = [105, 69]
-    output_buffer = []
+    output_buffer = queue.Queue()
     ss = Intcode(output_device=output_buffer)
     ss.load_program(program)
     output_instruction = Output(ss)
     output_instruction.act()
     assert ss.instr_ptr == 2
-    assert output_buffer == [69]
-
-
-def test_output_queue():
-    program = [5, 2, 69]
-    q = queue.Queue()
-    ss = Intcode(output_device=q)
-    ss.load_program(program)
-    output_instruction = Output(ss)
-    output_instruction.act()
-    assert ss.instr_ptr == 2
-    value = q.get()
-    assert value == 69
+    assert output_buffer.get() == 69
 
 
 def test_jump_if_true_position():
@@ -463,160 +441,176 @@ def test_day_04_part_2():
 
 
 def test_day_05_example_01():
-    input_buffer = ['42']
-    output_buffer = []
+    input_buffer = queue.Queue()
+    input_buffer.put(42)
+    output_buffer = queue.Queue()
     ss = Intcode(input_buffer, output_buffer)
     memory = [3, 0, 4, 0, 99]
     ss.load_program(memory)
     ss.run_program()
     assert memory == [42, 0, 4, 0, 99]
-    assert input_buffer == []
-    assert output_buffer[0] == 42
+    assert input_buffer.empty()
+    assert output_buffer.get() == 42
 
 
 def test_day_05_example_02():
-    input_buffer_1 = ['1']
-    output_buffer_1 = []
+    input_buffer_1 = queue.Queue()
+    input_buffer_1.put(1)
+    output_buffer_1 = queue.Queue()
     ss = Intcode(input_device=input_buffer_1, output_device=output_buffer_1)
     original_memory = [3, 9, 8, 9, 10, 9, 4, 9, 99, -1, 8]
     memory = list(original_memory)
     ss.load_program(memory)
     ss.run_program()
     assert memory[9] == 0
-    assert output_buffer_1 == [0]
-    input_buffer_2 = ['8']
-    output_buffer_2 = []
+    assert output_buffer_1.get() == 0
+    input_buffer_2 = queue.Queue()
+    input_buffer_2.put(8)
+    output_buffer_2 = queue.Queue()
     ss = Intcode(input_device=input_buffer_2, output_device=output_buffer_2)
     memory = list(original_memory)
     ss.load_program(memory)
     ss.run_program()
     assert memory[9] == 1
-    assert output_buffer_2 == [1]
+    assert output_buffer_2.get() == 1
 
 
 def test_day_05_example_03():
-    input_buffer_1 = ['1']
-    output_buffer_1 = []
+    input_buffer_1 = queue.Queue()
+    input_buffer_1.put(1)
+    output_buffer_1 = queue.Queue()
     ss = Intcode(input_device=input_buffer_1, output_device=output_buffer_1)
     original_memory = [3, 9, 7, 9, 10, 9, 4, 9, 99, -1, 8]
     memory = list(original_memory)
     ss.load_program(memory)
     ss.run_program()
     assert memory[9] == 1
-    assert output_buffer_1 == [1]
-    input_buffer_2 = ['9']
-    output_buffer_2 = []
+    assert output_buffer_1.get() == 1
+    input_buffer_2 = queue.Queue()
+    input_buffer_2.put(9)
+    output_buffer_2 = queue.Queue()
     ss = Intcode(input_device=input_buffer_2, output_device=output_buffer_2)
     memory = list(original_memory)
     ss.load_program(memory)
     ss.run_program()
     assert memory[9] == 0
-    assert output_buffer_2 == [0]
+    assert output_buffer_2.get() == 0
 
 
 def test_day_05_example_04():
-    input_buffer_1 = ['1']
-    output_buffer_1 = []
+    input_buffer_1 = queue.Queue()
+    input_buffer_1.put(1)
+    output_buffer_1 = queue.Queue()
     ss = Intcode(input_device=input_buffer_1, output_device=output_buffer_1)
     original_memory = [3, 3, 1108, -1, 8, 3, 4, 3, 99]
     memory = list(original_memory)
     ss.load_program(memory)
     ss.run_program()
     assert memory == [3, 3, 1108, 0, 8, 3, 4, 3, 99]
-    assert output_buffer_1 == [0]
-    input_buffer_2 = ['8']
-    output_buffer_2 = []
+    assert output_buffer_1.get() == 0
+    input_buffer_2 = queue.Queue()
+    input_buffer_2.put(8)
+    output_buffer_2 = queue.Queue()
     ss = Intcode(input_device=input_buffer_2, output_device=output_buffer_2)
     memory = list(original_memory)
     ss.load_program(memory)
     ss.run_program()
     assert memory == [3, 3, 1108, 1, 8, 3, 4, 3, 99]
-    assert output_buffer_2 == [1]
+    assert output_buffer_2.get() == 1
 
 
 def test_day_05_example_05():
-    input_buffer_1 = ['1']
-    output_buffer_1 = []
+    input_buffer_1 = queue.Queue()
+    input_buffer_1.put(1)
+    output_buffer_1 = queue.Queue()
     ss = Intcode(input_device=input_buffer_1, output_device=output_buffer_1)
     original_memory = [3, 3, 1107, -1, 8, 3, 4, 3, 99]
     memory = list(original_memory)
     ss.load_program(memory)
     ss.run_program()
     assert memory[3] == 1
-    assert output_buffer_1 == [1]
-    input_buffer_2 = ['9']
-    output_buffer_2 = []
+    assert output_buffer_1.get() == 1
+    input_buffer_2 = queue.Queue()
+    input_buffer_2.put(9)
+    output_buffer_2 = queue.Queue()
     ss = Intcode(input_device=input_buffer_2, output_device=output_buffer_2)
     memory = list(original_memory)
     ss.load_program(memory)
     ss.run_program()
     assert memory[3] == 0
-    assert output_buffer_2 == [0]
+    assert output_buffer_2.get() == 0
 
 
 def test_day_05_example_06():
-    input_buffer_1 = ['1']
-    output_buffer_1 = []
+    input_buffer_1 = queue.Queue()
+    input_buffer_1.put(1)
+    output_buffer_1 = queue.Queue()
     ss = Intcode(input_device=input_buffer_1, output_device=output_buffer_1)
     original_memory = [3, 12, 6, 12, 15, 1, 13, 14, 13, 4, 13, 99, -1, 0, 1, 9]
     memory = list(original_memory)
     ss.load_program(memory)
     ss.run_program()
     assert memory[12] == 1
-    assert output_buffer_1 == [1]
-    input_buffer_2 = ['0']
-    output_buffer_2 = []
+    assert output_buffer_1.get() == 1
+    input_buffer_2 = queue.Queue()
+    input_buffer_2.put(0)
+    output_buffer_2 = queue.Queue()
     ss = Intcode(input_device=input_buffer_2, output_device=output_buffer_2)
     memory = list(original_memory)
     ss.load_program(memory)
     ss.run_program()
     assert memory[12] == 0
-    assert output_buffer_2 == [0]
+    assert output_buffer_2.get() == 0
 
 
 def test_day_05_example_07():
     original_memory = [3, 3, 1105, -1, 9, 1101, 0, 0, 12, 4, 12, 99, 1]
-    input_buffer_1 = ['1']
-    output_buffer_1 = []
+    input_buffer_1 = queue.Queue()
+    input_buffer_1.put(1)
+    output_buffer_1 = queue.Queue()
     ss = Intcode(input_device=input_buffer_1, output_device=output_buffer_1)
     memory = list(original_memory)
     ss.load_program(memory)
     ss.run_program()
     assert memory == [3, 3, 1105, 1, 9, 1101, 0, 0, 12, 4, 12, 99, 1]
-    assert output_buffer_1 == [1]
-    input_buffer_2 = ['0']
-    output_buffer_2 = []
+    assert output_buffer_1.get() == 1
+    input_buffer_2 = queue.Queue()
+    input_buffer_2.put(0)
+    output_buffer_2 = queue.Queue()
     ss = Intcode(input_device=input_buffer_2, output_device=output_buffer_2)
     memory = list(original_memory)
     ss.load_program(memory)
     ss.run_program()
     assert memory == [3, 3, 1105, 0, 9, 1101, 0, 0, 12, 4, 12, 99, 0]
-    assert output_buffer_2 == [0]
+    assert output_buffer_2.get() == 0
 
 
 def test_day_05_example_08():
     original_memory = [3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20, 1006, 20, 31, 1106, 0, 36, 98, 0, 0, 1002, 21, 125, 20, 4, 20, 1105, 1, 46, 104, 999, 1105, 1, 46, 1101, 1000, 1, 20, 4, 20, 1105, 1, 46, 98, 99]  # noqa: E501
-    input_buffer_1 = ['7']
-    output_buffer_1 = []
+    input_buffer_1 = queue.Queue()
+    input_buffer_1.put(7)
+    output_buffer_1 = queue.Queue()
     ss_1 = Intcode(input_device=input_buffer_1, output_device=output_buffer_1)
     memory = list(original_memory)
     ss_1.load_program(memory)
     ss_1.run_program()
-    assert output_buffer_1 == [999]
-    input_buffer_2 = ['8']
-    output_buffer_2 = []
+    assert output_buffer_1.get() == 999
+    input_buffer_2 = queue.Queue()
+    input_buffer_2.put(8)
+    output_buffer_2 = queue.Queue()
     ss_2 = Intcode(input_device=input_buffer_2, output_device=output_buffer_2)
     memory = list(original_memory)
     ss_2.load_program(memory)
     ss_2.run_program()
-    assert output_buffer_2 == [1000]
-    input_buffer_3 = ['9']
-    output_buffer_3 = []
+    assert output_buffer_2.get() == 1000
+    input_buffer_3 = queue.Queue()
+    input_buffer_3.put(9)
+    output_buffer_3 = queue.Queue()
     ss_3 = Intcode(input_device=input_buffer_3, output_device=output_buffer_3)
     memory = list(original_memory)
     ss_3.load_program(memory)
     ss_3.run_program()
-    assert output_buffer_3 == [1001]
+    assert output_buffer_3.get() == 1001
 
 
 def test_day_09_example_01():
