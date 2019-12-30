@@ -3,14 +3,22 @@ import sys
 
 class Reaction:
 
-    def __init__(self, rcts, prd):
+    def __init__(self, rcts, prd, byps=None):
+        if byps is None:
+            byps = {}
         self.rcts = rcts
         self.prd = prd
+        self.byps = byps
 
     def __repr__(self):
         rct_array = [f"{self.rcts[r]} {r}" for r in self.rcts]
         rct_string = ', '.join(rct_array)
-        return f"{rct_string} => {self.prd[1]} {self.prd[0]}"
+        byp_array = [f"{self.byp[b]} {b}" for b in self.byps]
+        byp_string = ', '.join(byp_array)
+        me = f"{rct_string} => {self.prd[1]} {self.prd[0]}"
+        if byp_string != '':
+            me = me + ', ' + byp_string
+        return me
 
     @staticmethod
     def combine_terms(rcts_1, rcts_2):
@@ -31,12 +39,14 @@ class Reaction:
             return None
         else:
             this_rcts = {rct: self.rcts[rct] for rct in self.rcts if rct != other.prd[0]}
-            return Reaction(Reaction.combine_terms(this_rcts, other.rcts), self.prd)
+            return Reaction(Reaction.combine_terms(this_rcts, other.rcts), self.prd, self.byps)
 
     def add_term(self, rct, coefficient):
         new_rcts = {rct: self.rcts[rct] for rct in self.rcts}
-        new_rcts[rct] = self.rcts.get(rct, 0) + coefficient
-        return Reaction(new_rcts, self.prd)
+        new_rcts[rct] = new_rcts.get(rct, 0) + coefficient
+        new_byps = {byp: self.byps[byp] for byp in self.byps}
+        new_byps[rct] = new_byps.get(rct, 0) + coefficient
+        return Reaction(new_rcts, self.prd, new_byps)
 
     def multiply_by(self, factor):
         new_rcts = {rct: factor * self.rcts[rct] for rct in self.rcts}
