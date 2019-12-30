@@ -13,7 +13,7 @@ class Reaction:
     def __repr__(self):
         rct_array = [f"{self.rcts[r]} {r}" for r in self.rcts]
         rct_string = ', '.join(rct_array)
-        byp_array = [f"{self.byp[b]} {b}" for b in self.byps]
+        byp_array = [f"{self.byps[b]} {b}" for b in self.byps]
         byp_string = ', '.join(byp_array)
         me = f"{rct_string} => {self.prd[1]} {self.prd[0]}"
         if byp_string != '':
@@ -21,14 +21,28 @@ class Reaction:
         return me
 
     @staticmethod
-    def combine_terms(rcts_1, rcts_2):
+    def combine_terms(rcts_1, rcts_2, byps_1=None):
         new_rcts = {}
+        if byps_1 is None:
+            byps_1 = {}
+        new_byps = {b: byps_1[b] for b in byps_1}
         for rct in rcts_1:
             new_rcts[rct] = rcts_1[rct] + rcts_2.get(rct, 0)
         for rct in rcts_2:
             if rct not in new_rcts:
                 new_rcts[rct] = rcts_2[rct]
-        return new_rcts
+        for r in list(iter(new_rcts)):
+            if r in list(iter(new_byps)):
+                if new_rcts[r] > new_byps[r]:
+                    new_rcts[r] = new_rcts[r] - new_byps[r]
+                    del(new_byps[r])
+                elif new_rcts[r] < new_byps[r]:
+                    new_byps[r] = new_byps[r] - new_rcts[r]
+                    del(new_rcts[r])
+                else:
+                    del(new_rcts[r])
+                    del(new_byps[r])
+        return new_rcts, new_byps
 
     def substitute(self, other):
         if other.prd[0] not in self.rcts:
@@ -39,7 +53,8 @@ class Reaction:
             return None
         else:
             this_rcts = {rct: self.rcts[rct] for rct in self.rcts if rct != other.prd[0]}
-            return Reaction(Reaction.combine_terms(this_rcts, other.rcts), self.prd, self.byps)
+            new_rcts, new_byps = Reaction.combine_terms(this_rcts, other.rcts, self.byps)
+            return Reaction(new_rcts, self.prd, self.byps)
 
     def add_term(self, rct, coefficient):
         new_rcts = {rct: self.rcts[rct] for rct in self.rcts}
