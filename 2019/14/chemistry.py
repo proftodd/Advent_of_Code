@@ -1,8 +1,15 @@
+import sys
+
 class Reaction:
 
     def __init__(self, rcts, prd):
         self.rcts = rcts
         self.prd = prd
+
+    def __repr__(self):
+        rct_array = [f"{self.rcts[r]} {r}" for r in self.rcts]
+        rct_string = ', '.join(rct_array)
+        return f"{rct_string} => {self.prd[1]} {self.prd[0]}"
 
     @staticmethod
     def combine_terms(rcts_1, rcts_2):
@@ -46,3 +53,36 @@ class Reaction:
             difference = new_other.prd[1] - self.rcts[new_other.prd[0]]
             new_me = self.add_term(new_other.prd[0], difference)
             return new_me.substitute(new_other)
+
+
+def read_file(filename):
+    rxns = {}
+    fp = open(filename, 'r')
+    for line in fp:
+        line = line.strip()
+        (rct_string, prd_string) = line.split(' => ')
+        (prd_coef, prd) = prd_string.split()
+        rct_array = rct_string.split(', ')
+        rct_tuples = [r.split() for r in rct_array]
+        rct_map = {rt[1]: int(rt[0]) for rt in rct_tuples}
+        rxns[prd] = Reaction(rct_map, (prd, int(prd_coef)))
+    fp.close()
+    return rxns
+
+
+def simplify_reaction_set(rxns):
+    target = rxns['FUEL']
+    while len(target.rcts) > 1:
+        next_rct = 'ORE'
+        i = iter(target.rcts)
+        while next_rct == 'ORE':
+            next_rct = i.__next__()
+        target = target.complex_substitute(rxns[next_rct])
+    return target
+
+
+if __name__ == '__main__':
+    filename = sys.argv[1]
+    rxns = read_file(filename)
+    target = simplify_reaction_set(rxns)
+    repr(target)
