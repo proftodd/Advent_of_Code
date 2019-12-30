@@ -71,19 +71,30 @@ def read_file(filename):
     return rxns
 
 
-def get_next_reactant(rxn):
-    rct_list = list(rxn.rcts.items())
-    sorted_list = sorted(rct_list, key=lambda t: t[1], reverse=False)
-    if sorted_list[0][0] == 'ORE':
-        sorted_list = sorted_list[1:]
+def get_next_reactant(rxn_map, target_rxn):
+    rct_list = list(target_rxn.rcts.items())
+    waste_list = []
+    for candidate in rct_list:
+        if candidate[0] == 'ORE':
+            continue
+        prd_coef = rxn_map[candidate[0]].prd[1]
+        candidate_coef = candidate[1]
+        if prd_coef == 1:
+            return candidate[0]
+        if candidate_coef % prd_coef == 0:
+            return candidate[0]
+        factor = prd_coef // candidate_coef + 1
+        waste = candidate_coef * factor - prd_coef
+        waste_list.append((candidate[0], waste))
+    sorted_list = sorted(waste_list, key=lambda t: t[1], reverse=False)
     return sorted_list[0][0]
 
 
-def simplify_reaction_set(rxns):
-    target = rxns['FUEL']
+def simplify_reaction_set(rxn_set):
+    target = rxn_set['FUEL']
     while len(target.rcts) > 1:
-        next_rct = get_next_reactant(target)
-        target = target.complex_substitute(rxns[next_rct])
+        next_rct = get_next_reactant(rxn_set, target)
+        target = target.complex_substitute(rxn_set[next_rct])
     return target
 
 
@@ -91,4 +102,4 @@ if __name__ == '__main__':
     filename = sys.argv[1]
     rxns = read_file(filename)
     target = simplify_reaction_set(rxns)
-    repr(target)
+    print(repr(target))
