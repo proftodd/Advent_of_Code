@@ -54,7 +54,7 @@ class Reaction:
         else:
             this_rcts = {rct: self.rcts[rct] for rct in self.rcts if rct != other.prd[0]}
             new_rcts, new_byps = Reaction.combine_terms(this_rcts, other.rcts, self.byps)
-            return Reaction(new_rcts, self.prd, self.byps)
+            return Reaction(new_rcts, self.prd, new_byps)
 
     def add_term(self, rct, coefficient):
         new_rcts = {rct: self.rcts[rct] for rct in self.rcts}
@@ -74,9 +74,13 @@ class Reaction:
             new_other = other.multiply_by(factor)
             return self.substitute(new_other)
         else:
-            factor = self.rcts[other.prd[0]] // other.prd[1] + 1
-            new_other = other.multiply_by(factor)
-            difference = new_other.prd[1] - self.rcts[new_other.prd[0]]
+            if self.rcts[other.prd[0]] == 1:
+                new_other = other
+                difference = other.prd[1] - self.rcts[other.prd[0]]
+            else:
+                factor = self.rcts[other.prd[0]] // other.prd[1] + 1
+                new_other = other.multiply_by(factor)
+                difference = new_other.prd[1] - self.rcts[new_other.prd[0]]
             new_me = self.add_term(new_other.prd[0], difference)
             return new_me.substitute(new_other)
 
