@@ -21,11 +21,18 @@ class Reaction:
         return me
 
     @staticmethod
+    def from_string(line):
+        (rct_string, prd_string) = line.split(' => ')
+        (prd_coef, prd) = prd_string.split()
+        rct_array = rct_string.split(', ')
+        rct_tuples = [r.split() for r in rct_array]
+        rct_map = {rt[1]: int(rt[0]) for rt in rct_tuples}
+        return Reaction(rct_map, (prd, int(prd_coef)))
+
+    @staticmethod
     def combine_terms(rcts_1, rcts_2, byps_1=None):
         new_rcts = {}
-        if byps_1 is None:
-            byps_1 = {}
-        new_byps = {b: byps_1[b] for b in byps_1}
+        new_byps = {} if byps_1 is None else {b: byps_1[b] for b in byps_1}
         for rct in rcts_1:
             new_rcts[rct] = rcts_1[rct] + rcts_2.get(rct, 0)
         for rct in rcts_2:
@@ -66,7 +73,8 @@ class Reaction:
     def multiply_by(self, factor):
         new_rcts = {rct: factor * self.rcts[rct] for rct in self.rcts}
         new_prd = (self.prd[0], self.prd[1] * factor)
-        return Reaction(new_rcts, new_prd)
+        new_byps = {byp: factor * self.byps[byp] for byp in self.byps}
+        return Reaction(new_rcts, new_prd, new_byps)
 
     def complex_substitute(self, other):
         if self.rcts[other.prd[0]] % other.prd[1] == 0:
@@ -90,12 +98,8 @@ def read_file(filename):
     fp = open(filename, 'r')
     for line in fp:
         line = line.strip()
-        (rct_string, prd_string) = line.split(' => ')
-        (prd_coef, prd) = prd_string.split()
-        rct_array = rct_string.split(', ')
-        rct_tuples = [r.split() for r in rct_array]
-        rct_map = {rt[1]: int(rt[0]) for rt in rct_tuples}
-        rxns[prd] = Reaction(rct_map, (prd, int(prd_coef)))
+        rxn = Reaction.from_string(line)
+        rxns[rxn.prd[0]] = rxn
     fp.close()
     return rxns
 
@@ -125,12 +129,9 @@ def get_next_reactant(rxn_map, target_rxn):
 
 def simplify_reaction_set(rxn_set):
     target = rxn_set['FUEL']
-    print(target)
     while len(target.rcts) > 1:
         next_rct = get_next_reactant(rxn_set, target)
-        print(f"Substitute ({rxn_set[next_rct]}) for {next_rct}")
         target = target.complex_substitute(rxn_set[next_rct])
-        print(target)
     return target
 
 
