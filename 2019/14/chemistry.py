@@ -1,5 +1,6 @@
 import sys
 
+
 class Reaction:
 
     def __init__(self, rcts, prd):
@@ -70,13 +71,18 @@ def read_file(filename):
     return rxns
 
 
+def get_next_reactant(rxn):
+    rct_list = list(rxn.rcts.items())
+    sorted_list = sorted(rct_list, key=lambda t: t[1], reverse=False)
+    if sorted_list[0][0] == 'ORE':
+        sorted_list = sorted_list[1:]
+    return sorted_list[0][0]
+
+
 def simplify_reaction_set(rxns):
     target = rxns['FUEL']
     while len(target.rcts) > 1:
-        next_rct = 'ORE'
-        i = iter(target.rcts)
-        while next_rct == 'ORE':
-            next_rct = i.__next__()
+        next_rct = get_next_reactant(target)
         target = target.complex_substitute(rxns[next_rct])
     return target
 
