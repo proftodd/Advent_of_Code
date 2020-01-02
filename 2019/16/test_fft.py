@@ -1,4 +1,4 @@
-from fft import calculate_digit, get_pattern, fft
+from fft import calculate_digit, get_pattern, decode, fft
 
 
 def test_calculate_digit():
@@ -45,3 +45,18 @@ def test_example_03():
     output_sequence = fft(input_sequence, 100)
     assert len(str(input_sequence)) == len(str(output_sequence))
     assert output_sequence[:8] == '52432133'
+
+
+def test_decode_01():
+    sequence = '03036732577212944063491565474664'
+    assert decode(sequence, 100) == '84462026'
+
+
+def test_decode_02():
+    sequence = '02935109699940807407585447034323'
+    assert decode(sequence, 100) == '78725270'
+
+
+def test_decode_03():
+    sequence = '03081770884921959731165446850517'
+    assert decode(sequence, 100) == '53553731'

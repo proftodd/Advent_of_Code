@@ -32,12 +32,25 @@ def fft(sequence, phases):
     return ''.join(list(map(str, return_sequence)))
 
 
+def decode(sequence, phases):
+    offset = int(sequence[:7])
+    message_end = offset + 8
+    signal = ''.join(sequence * 10_000)
+    output_signal = fft(signal, phases)
+    return output_signal[offset:message_end]
+
+
+def read_sequence(filename):
+    with open(filename, 'r') as fp:
+        line = fp.readline()
+    sequence = line.strip()
+    return sequence
+
+
 if __name__ == '__main__':
     filename = sys.argv[1]
     phases = int(sys.argv[2])
 
-    with open(filename, 'r') as fp:
-        line = fp.readline()
-    sequence = line.strip()
+    sequence = read_sequence(filename)
     output_sequence = fft(sequence, phases)
     print(f"The first 8 digits are {output_sequence[:8]}")
