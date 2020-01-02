@@ -2,14 +2,15 @@ from fft import calculate_digit, get_pattern, fft
 
 
 def test_calculate_digit():
-    assert calculate_digit('12345678', [0, 1, 0, -1]) == '4'
-    assert calculate_digit('12345678', [0, 0, 1, 1, 0, 0, -1, -1]) == '8'
-    assert calculate_digit('12345678', [0, 0, 0, 1, 1, 1, 0, 0, 0, -1, -1, -1]) == '2'
-    assert calculate_digit('12345678', get_pattern(4)) == '2'
-    assert calculate_digit('12345678', get_pattern(5)) == '6'
-    assert calculate_digit('12345678', get_pattern(6)) == '1'
-    assert calculate_digit('12345678', get_pattern(7)) == '5'
-    assert calculate_digit('12345678', get_pattern(8)) == '8'
+    input_sequence = list(map(int, list('12345678')))
+    assert calculate_digit(0, input_sequence, [1, 0, -1, 0]) == 4
+    assert calculate_digit(1, input_sequence, [0, 1, 1, 0, 0, -1, -1, 0]) == 8
+    assert calculate_digit(2, input_sequence, [0, 0, 1, 1, 1, 0, 0, 0, -1, -1, -1, 0]) == 2
+    assert calculate_digit(3, input_sequence, get_pattern(4)) == 2
+    assert calculate_digit(4, input_sequence, get_pattern(5)) == 6
+    assert calculate_digit(5, input_sequence, get_pattern(6)) == 1
+    assert calculate_digit(6, input_sequence, get_pattern(7)) == 5
+    assert calculate_digit(7, input_sequence, get_pattern(8)) == 8
 
 
 def test_example_00():
