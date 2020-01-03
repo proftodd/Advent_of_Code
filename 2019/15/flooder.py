@@ -39,6 +39,7 @@ if __name__ == '__main__':
     print_maze(time, maze)
     while any([v == '.' or v == 'd' for v in maze.values()]):
         time = time + 1
+        spaces_to_fill = []
         for position in maze:
             if maze[position] == mm.map_icons[mr.TANK]:
                 for direction in mm.position_change.values():
@@ -48,7 +49,9 @@ if __name__ == '__main__':
                     )
                     adjacent_condition = maze.get(adjacent, mm.map_icons[mr.WALL])
                     if adjacent_condition == mm.map_icons[mr.CLEAR] or adjacent_condition == mm.map_icons[-1]:
-                        maze[adjacent] = mm.map_icons[mr.TANK]
+                        spaces_to_fill.append(adjacent)
+        for space in spaces_to_fill:
+            maze[space] = mm.map_icons[mr.TANK]
         if time % 20 == 0:
             print_maze(time, maze)
     print(f"It took {time} minutes to fill the ship with oxygen")
