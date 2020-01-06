@@ -1,34 +1,54 @@
 import sys
 
 BASE_PATTERN = [[0], [1], [0], [-1]]
-pattern_cache = {}
+operator_cache = {}
 
 
-def get_pattern(n):
+def get_pattern(sequence_length, position):
     pattern = []
     for p in BASE_PATTERN:
-        pattern.extend(p * n)
+        pattern.extend(p * (position + 1))
     pattern = pattern[1:] + [pattern[0]]
+    while len(pattern) < sequence_length:
+        pattern.extend(pattern)
+    pattern = pattern[:sequence_length]
     return pattern
 
 
-def calculate_digit(digit, sequence, pattern):
+def get_operators(pattern):
+    adders = []
+    subtractors = []
+    for i in range(len(pattern)):
+        if pattern[i] == 1:
+            adders.append(i)
+        elif pattern[i] == -1:
+            subtractors.append(i)
+    return adders, subtractors
+
+
+def calculate_operators(sequence_length):
+    global operator_cache
+    operator_cache = {d: get_operators(get_pattern(sequence_length, d)) for d in range(sequence_length)}
+
+
+def calculate_digit(digit, the_sequence):
     this_sum = 0
-    for k in range(digit, len(sequence)):
-        index = k % len(pattern)
-        if pattern[index]:
-            this_sum = this_sum + sequence[k] * pattern[index]
+    adders, subtractors = operator_cache[digit]
+    this_sum += sum([the_sequence[p] for p in adders])
+    this_sum -= sum([the_sequence[p] for p in subtractors])
     return abs(this_sum) % 10
 
 
 def fft(sequence, phases):
     return_sequence = list(map(int, list(sequence)))
+    calculate_operators(len(sequence))
     for i in range(phases):
         new_sequence = [0] * len(sequence)
-        for j in range(len(sequence) - 1, -1, -1):
-            pattern = pattern_cache.get(j + 1, get_pattern(j + 1))
-            new_sequence[j] = calculate_digit(j, return_sequence, pattern)
+        for j in range(len(sequence)):
+            new_sequence[j] = calculate_digit(j, return_sequence)
         return_sequence = new_sequence
+        if i % 5 == 0:
+            print(f"{i} phases completed")
     return ''.join(list(map(str, return_sequence)))
 
 
