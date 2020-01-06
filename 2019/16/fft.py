@@ -1,4 +1,5 @@
 import sys
+from multiprocessing import Pool
 
 BASE_PATTERN = [[0], [1], [0], [-1]]
 operator_cache = {}
@@ -42,13 +43,12 @@ def calculate_digit(digit, the_sequence):
 def fft(sequence, phases):
     return_sequence = list(map(int, list(sequence)))
     calculate_operators(len(sequence))
-    for i in range(phases):
-        new_sequence = [0] * len(sequence)
-        for j in range(len(sequence)):
-            new_sequence[j] = calculate_digit(j, return_sequence)
-        return_sequence = new_sequence
-        if i % 5 == 0:
-            print(f"{i} phases completed")
+    with Pool() as p:
+        for i in range(phases):
+            threads = [p.apply_async(calculate_digit, (j, return_sequence)) for j in range(len(sequence))]
+            return_sequence = [r.get() for r in threads]
+            if i % 5 == 0:
+                print(f"{i} phases completed")
     return ''.join(list(map(str, return_sequence)))
 
 
