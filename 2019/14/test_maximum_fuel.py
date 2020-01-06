@@ -32,6 +32,7 @@ def test_example_01():
     assert simplified.rcts['A'] == 28
     assert simplified.rcts['B'] == 1
     assert simplified.prd[1] == 1
+    assert mx.max_fuel(simplified, rxn_map, 100) == 3
 
 
 def test_example_02():
@@ -50,6 +51,7 @@ def test_example_02():
     assert simplified.rcts['A'] == 10
     assert simplified.rcts['B'] == 23
     assert simplified.rcts['C'] == 37
+    assert mx.max_fuel(simplified, rxn_map, 1000) == 6
 
 
 def test_example_03():
@@ -72,6 +74,7 @@ def test_example_03():
     assert simplified.rcts['HKGWZ'] == Fraction(1259, 24)
     assert simplified.rcts['NZVS'] == Fraction(267, 8)
     assert simplified.rcts['PSHF'] == Fraction(5801, 36)
+    assert mx.max_fuel(simplified, rxn_map, 1_000_000_000_000) == 82892753
 
 
 def test_example_04():
@@ -96,6 +99,7 @@ def test_example_04():
     assert simplified.rcts['MNCFX'] == Fraction(12545, 3)
     assert simplified.rcts['NVRVD'] == Fraction(3149, 6)
     assert simplified.rcts['VJHF'] == Fraction(23809, 12)
+    assert mx.max_fuel(simplified, rxn_map, 1_000_000_000_000) == 5586022
 
 
 def test_example_05():
@@ -125,3 +129,5 @@ def test_example_05():
     assert simplified.rcts['CNZTR'] == Fraction(1092987, 16)
     assert simplified.rcts['KTJDG'] == Fraction(75119, 24)
     assert simplified.rcts['VRPVC'] == Fraction(163185319, 5040)
+    assert mx.max_fuel(simplified, rxn_map, 1_000_000_000_000) == 460664
+
