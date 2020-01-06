@@ -52,11 +52,28 @@ def fft(sequence, phases):
     return ''.join(list(map(str, return_sequence)))
 
 
-def decode(sequence, phases):
-    offset = int(sequence[:7])
+def fast_fft(sequence, phases):
+    s = list(map(int, sequence))
+    s_length = len(s)
+    for i in range(phases):
+        for j in range(s_length - 2, -1, -1):
+            s[j] = (s[j] + s[j + 1]) % 10
+        if i % 5 == 0:
+            print(f"{i + 1} phases completed")
+    return ''.join(map(str, s))
+
+
+def decode(signal, phases):
+    offset = int(signal[:7])
     message_end = offset + 8
-    signal = ''.join(sequence * 10_000)
-    output_signal = fft(signal, phases)
+    s_half_l = len(signal) // 2
+    if offset >= s_half_l:
+        offset = offset - s_half_l
+        message_end = message_end - s_half_l
+        signal = signal[s_half_l:]
+        output_signal = fast_fft(signal, phases)
+    else:
+        output_signal = fft(signal, phases)
     return output_signal[offset:message_end]
 
 

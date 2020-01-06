@@ -73,14 +73,17 @@ def test_example_03():
 
 def test_decode_01():
     sequence = '03036732577212944063491565474664'
-    assert decode(sequence, 100) == '84462026'
+    signal = ''.join(sequence * 10_000)
+    assert decode(signal, 100) == '84462026'
 
 
 def test_decode_02():
     sequence = '02935109699940807407585447034323'
-    assert decode(sequence, 100) == '78725270'
+    signal = ''.join(sequence * 10_000)
+    assert decode(signal, 100) == '78725270'
 
 
 def test_decode_03():
     sequence = '03081770884921959731165446850517'
-    assert decode(sequence, 100) == '53553731'
+    signal = ''.join(sequence * 10_000)
+    assert decode(signal, 100) == '53553731'
