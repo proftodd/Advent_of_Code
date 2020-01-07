@@ -26,5 +26,9 @@ if __name__ == '__main__':
     ss = Intcode(input_device=input_buffer, output_device=output_buffer)
     ss.load_program(program)
     ss.run_program()
-    dust = output_buffer.get()
-    print(f"The dust collected = {dust}")
+    v = output_buffer.get()
+    while not output_buffer.empty():
+        the_char = str(chr(v))
+        print(the_char, end='')
+        v = output_buffer.get()
+    print(f"The dust collected = {v}")
