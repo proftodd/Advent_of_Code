@@ -45,6 +45,17 @@ namespace Day_02
         }
 
         [Test]
+        public void It_correctly_compares_strings_to_alternate_policies()
+        {
+            var p1 = new Policy { letter = 'a', min = 1, max = 3 };
+            var p2 = new Policy { letter = 'b', min = 1, max = 3 };
+            var p3 = new Policy { letter = 'c', min = 2, max = 9 };
+            Assert.IsTrue(p1.IsAlternateMatch("abcde"));
+            Assert.IsFalse(p2.IsAlternateMatch("cdefg"));
+            Assert.IsFalse(p3.IsAlternateMatch("ccccccccc"));
+        }
+
+        [Test]
         public void It_counts_correct_passwords()
         {
             string[] input = {

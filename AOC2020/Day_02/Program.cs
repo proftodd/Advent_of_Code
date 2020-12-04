@@ -13,6 +13,8 @@ namespace Day_02
             var input = File.ReadAllLines(args[0]);
             var matches = FindMatches(input);
             Console.WriteLine($"{matches.Length} passwords met the policy in force");
+            var aMatches = FindAlternateMatches(input);
+            Console.WriteLine($"{aMatches.Length} passwords met the alternate policy in force");
         }
 
         public static ValueTuple<Policy, string> ParseInputLine(string line)
@@ -54,6 +56,17 @@ namespace Day_02
                 .Select(t => t.Item2)
                 .ToArray();
         }
+
+        public static string[] FindAlternateMatches(string[] input)
+        {
+            return input.Select(s => ParseInputLine(s))
+                .Where(t => {
+                    var (policy, testString) = t;
+                    return policy.IsAlternateMatch(testString);
+                })
+                .Select(t => t.Item2)
+                .ToArray();
+        }
     }
 
     public struct Policy
@@ -76,6 +89,20 @@ namespace Day_02
             return characterCount.ContainsKey(policy.letter)
                 && characterCount[policy.letter] >= policy.min
                 && characterCount[policy.letter] <= policy.max;
+        }
+
+        public static bool IsAlternateMatch(this Policy policy, string testString)
+        {
+            int matchCount = 0;
+            if (testString.Length >= policy.min && testString[policy.min - 1] == policy.letter)
+            {
+                ++matchCount;
+            }
+            if (testString.Length >= policy.max && testString[policy.max - 1] == policy.letter)
+            {
+                ++matchCount;
+            }
+            return matchCount == 1;
         }
     }
 }
