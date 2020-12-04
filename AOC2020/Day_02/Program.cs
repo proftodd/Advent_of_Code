@@ -11,9 +11,9 @@ namespace Day_02
         static void Main(string[] args)
         {
             var input = File.ReadAllLines(args[0]);
-            var matches = FindMatches(input);
+            var matches = FindMatches(input, (policy, testString) => policy.IsMatch(testString));
             Console.WriteLine($"{matches.Length} passwords met the policy in force");
-            var aMatches = FindAlternateMatches(input);
+            var aMatches = FindMatches(input, (policy, testString) => policy.IsAlternateMatch(testString));
             Console.WriteLine($"{aMatches.Length} passwords met the alternate policy in force");
         }
 
@@ -34,35 +34,24 @@ namespace Day_02
             var theDictionary = new Dictionary<char, int>();
             foreach (var aChar in targetString)
             {
-                if (!theDictionary.TryGetValue(aChar, out var count))
+                if (theDictionary.TryGetValue(aChar, out var count))
                 {
-                    theDictionary.Add(aChar, 1);
+                    theDictionary[aChar] = count + 1;
                 }
                 else
                 {
-                    theDictionary[aChar] = count + 1;
+                    theDictionary.Add(aChar, 1);
                 }
             }
             return theDictionary;
         }
 
-        public static string[] FindMatches(string[] input)
+        public static string[] FindMatches(string[] input, Func<Policy, string, bool> test)
         {
             return input.Select(s => ParseInputLine(s))
                 .Where(t => {
                     var (policy, testString) = t;
-                    return policy.IsMatch(testString);
-                })
-                .Select(t => t.Item2)
-                .ToArray();
-        }
-
-        public static string[] FindAlternateMatches(string[] input)
-        {
-            return input.Select(s => ParseInputLine(s))
-                .Where(t => {
-                    var (policy, testString) = t;
-                    return policy.IsAlternateMatch(testString);
+                    return test(policy, testString);
                 })
                 .Select(t => t.Item2)
                 .ToArray();

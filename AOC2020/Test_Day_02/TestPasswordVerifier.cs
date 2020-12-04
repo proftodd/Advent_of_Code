@@ -63,8 +63,10 @@ namespace Day_02
                 "1-3 b: cdefg",
                 "2-9 c: ccccccccc"
             };
-            var matches = Program.FindMatches(input);
+            var matches = Program.FindMatches(input, (policy, testString) => policy.IsMatch(testString));
             Assert.AreEqual(2, matches.Length);
+            var alternateMatches = Program.FindMatches(input, (policy, testString) => policy.IsAlternateMatch(testString));
+            Assert.AreEqual(1, alternateMatches.Length);
         }
     }
 }
