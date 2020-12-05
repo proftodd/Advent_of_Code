@@ -10,8 +10,9 @@ namespace Day_03
         static void Main(string[] args)
         {
             var map = File.ReadAllLines(args[0]);
-            long product = Enumerable.Range(1, args.Length - 1)
-                .Select(i => args[i])
+            long treeCount = CountTrees(map, 3, 1);
+            Console.WriteLine($"{treeCount} trees encountered doing (3,1) route");
+            long product = args[1..^0]
                 .Select(s => {
                     var subArray = s.Split(",");
                     return (int.Parse(subArray[0]), int.Parse(subArray[1]));
