@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Day_04
 {
@@ -10,10 +11,12 @@ namespace Day_04
         static void Main(string[] args)
         {
             var input = File.ReadAllLines(args[0]);
-            var valid = ParseRecords(input)
-                .Select(l => new Passport(l))
-                .Where(p => p.IsValid());
+            var passports = ParseRecords(input)
+                .Select(l => new Passport(l));
+            var valid = passports.Where(p => p.IsValid());
+            var strictValid = valid.Where(p => p.IsStrictValid());
             Console.WriteLine($"Valid passport count: {valid.Count()}");
+            Console.WriteLine($"Strict valid count: {strictValid.Count()}");
         }
 
         public static List<string> ParseRecords(string[] lines)
@@ -107,6 +110,113 @@ namespace Day_04
                 && !string.IsNullOrWhiteSpace(HairColor)
                 && !string.IsNullOrWhiteSpace(EyeColor)
                 && !string.IsNullOrWhiteSpace(PassportID);
+        }
+
+        public bool IsStrictValid()
+        {
+            return ValidBirthYear(BirthYear)
+                && ValidIssueYear(IssueYear)
+                && ValidExpirationYear(ExpirationYear)
+                && ValidHeight(Height)
+                && ValidHairColor(HairColor)
+                && ValidEyeColor(EyeColor)
+                && ValidPassportID(PassportID);
+        }
+
+        public static bool ValidBirthYear(string byr)
+        {
+            if (byr == null)
+            {
+                return false;
+            }
+
+            int birthYear = int.Parse(byr);
+            return birthYear >= 1920 && birthYear <= 2002;
+        }
+
+        public static bool ValidIssueYear(string iyr)
+        {
+            if (iyr == null)
+            {
+                return false;
+            }
+
+            int issueYear = int.Parse(iyr);
+            return issueYear >= 2010 && issueYear <= 2020;
+        }
+
+        public static bool ValidExpirationYear(string eyr)
+        {
+            if (eyr == null)
+            {
+                return false;
+            }
+
+            int expirationYear = int.Parse(eyr);
+            return expirationYear >= 2020 && expirationYear <= 2030;
+        }
+
+        public static bool ValidHeight(string hgt)
+        {
+            if (hgt == null)
+            {
+                return false;
+            }
+
+            var heightValidator = new Regex(@"^(\d+)(cm|in)$");
+            var matches = heightValidator.Matches(hgt);
+            if (matches.Count != 1)
+            {
+                return false;
+            }
+
+            var measure = int.Parse(matches[0].Groups[1].Value);
+            var unit = matches[0].Groups[2].Value;
+            if (unit == "cm")
+            {
+                return measure >= 150 && measure <= 193;
+            }
+            else if (unit == "in")
+            {
+                return measure >= 59 && measure <= 76;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public static bool ValidHairColor(string hcl)
+        {
+            if (hcl == null)
+            {
+                return false;
+            }
+
+            var hairColorValidator = new Regex(@"^#[0-9a-f]{6}$");
+            return hairColorValidator.Matches(hcl).Count == 1;
+        }
+
+        public static bool ValidEyeColor(string ecl)
+        {
+            return ecl == "amb"
+                || ecl == "blu"
+                || ecl == "brn"
+                || ecl == "gry"
+                || ecl == "grn"
+                || ecl == "hzl"
+                || ecl == "oth";
+        }
+
+        public static bool ValidPassportID(string pid)
+        {
+            if (pid == null)
+            {
+                return false;
+            }
+
+            var passportIdValidator = new Regex(@"^\d{9}$");
+            return passportIdValidator.Matches(pid).Count == 1;
         }
     }
 }
