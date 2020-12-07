@@ -9,10 +9,26 @@ namespace Day_05
         static void Main(string[] args)
         {
             var data = File.ReadAllLines(args[0]);
-            var maxSeatID = data
+            var seatIDs = data
                 .Select(s => GetSeatID(s))
-                .Max();
+                .ToArray();
+            var maxSeatID = seatIDs.Max();
+
             Console.WriteLine($"Max Seat ID: {maxSeatID}");
+
+            int mySeatID = -1;
+            for (int i = 1; i < maxSeatID; ++i)
+            {
+                if (seatIDs.Contains(i - 1)
+                && !seatIDs.Contains(i)
+                &&  seatIDs.Contains(i + 1))
+                {
+                    mySeatID = i;
+                    break;
+                }
+            }
+            
+            Console.WriteLine($"My seat ID is {mySeatID}");
         }
 
         public static int GetSeatID(string boardingPass)
