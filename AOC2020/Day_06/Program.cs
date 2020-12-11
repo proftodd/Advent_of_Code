@@ -23,7 +23,20 @@ namespace Day_06
                 return nd;
             }));
             var anyAnsweredCount = anyAnswered.Select(d => d.Keys.Count()).Sum();
-            Console.WriteLine($"Sum of answered question sets: {anyAnsweredCount}");
+            var allAnswered = groupAnswerSets.Select(ld => ld.Aggregate((d, d1) => {
+                var nd = new Dictionary<char, int>();
+                foreach (var c in d1.Keys)
+                {
+                    if (d.ContainsKey(c))
+                    {
+                        nd.Add(c, d[c]);
+                    }
+                }
+                return nd;
+            }));
+            var allAnsweredCount = allAnswered.Select(d => d.Keys.Count()).Sum();
+            Console.WriteLine($"Sum of answered question sets (any answered): {anyAnsweredCount}");
+            Console.WriteLine($"Sum of answered question sets (all answered): {allAnsweredCount}");
         }
 
         public static List<string> ParseGroupAnswers(string[] lines)
