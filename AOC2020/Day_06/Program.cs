@@ -13,61 +13,21 @@ namespace Day_06
             var input = File.ReadAllLines(args[0]);
             var groupAnswerSets = CollectionUtils.CollectRecords(input)
                 .Select(l => l.Split())
-                .Select(ls => ls.Select(s => CountAnsweredQuestions(s)));
+                .Select(ls => ls.Select(s => new HashSet<char>(s)));
             var anyAnswered = groupAnswerSets.Select(ld => ld.Aggregate((d, d1) => {
-                var nd = new Dictionary<char, int>(d);
-                foreach (var c in d1.Keys)
-                {
-                    nd.TryAdd(c, d1[c]);
-                }
-                return nd;
+                var ns = new HashSet<char>(d);
+                ns.UnionWith(d1);
+                return ns;
             }));
-            var anyAnsweredCount = anyAnswered.Select(d => d.Keys.Count()).Sum();
+            var anyAnsweredCount = anyAnswered.Select(d => d.Count()).Sum();
             var allAnswered = groupAnswerSets.Select(ld => ld.Aggregate((d, d1) => {
-                var nd = new Dictionary<char, int>();
-                foreach (var c in d1.Keys)
-                {
-                    if (d.ContainsKey(c))
-                    {
-                        nd.Add(c, d[c]);
-                    }
-                }
-                return nd;
+                var ns = new HashSet<char>(d);
+                ns.IntersectWith(d1);
+                return ns;
             }));
-            var allAnsweredCount = allAnswered.Select(d => d.Keys.Count()).Sum();
+            var allAnsweredCount = allAnswered.Select(d => d.Count()).Sum();
             Console.WriteLine($"Sum of answered question sets (any answered): {anyAnsweredCount}");
             Console.WriteLine($"Sum of answered question sets (all answered): {allAnsweredCount}");
-        }
-
-        public static List<string> ParseGroupAnswers(string[] lines)
-        {
-            return lines.Aggregate(
-                new List<string>(new[] { "" }),
-                (l, s) => {
-                    if (string.IsNullOrWhiteSpace(s))
-                    {
-                        return l.Concat(new[] { "" }).ToList<string>();
-                    }
-                    else
-                    {
-                        var l2 = l.GetRange(0, l.Count() - 1);
-                        var s2 = string.IsNullOrWhiteSpace(l[^1]) ? s : l[^1] + "" + s;
-                        return l2.Concat(new[] { s2 }).ToList<string>();
-                    }
-                }
-            );
-        }
-
-        public static Dictionary<char, int> CountAnsweredQuestions(string input)
-        {
-            var ret = input
-                .GroupBy(
-                    c => c,
-                    c => c,
-                    (c, l) => (c, l.Count())
-                )
-                .ToDictionary(t => t.Item1, t => t.Item2);
-            return ret;
         }
     }
 }
