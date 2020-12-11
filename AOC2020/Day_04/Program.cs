@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Shared;
 
 namespace Day_04
 {
@@ -11,31 +12,12 @@ namespace Day_04
         static void Main(string[] args)
         {
             var input = File.ReadAllLines(args[0]);
-            var passports = ParseRecords(input)
+            var passports = CollectionUtils.CollectRecords(input)
                 .Select(l => new Passport(l));
             var valid = passports.Where(p => p.IsValid());
             var strictValid = valid.Where(p => p.IsStrictValid());
             Console.WriteLine($"Valid passport count: {valid.Count()}");
             Console.WriteLine($"Strict valid count: {strictValid.Count()}");
-        }
-
-        public static List<string> ParseRecords(string[] lines)
-        {
-            return lines.Aggregate(
-                new List<string>(new[] { "" }),
-                (l, s) => {
-                    if (string.IsNullOrWhiteSpace(s))
-                    {
-                        return l.Concat(new[] { "" }).ToList<string>();
-                    }
-                    else
-                    {
-                        var l2 = l.GetRange(0, l.Count() - 1);
-                        var s2 = string.IsNullOrWhiteSpace(l[^1]) ? s : l[^1] + " " + s;
-                        return l2.Concat(new[] { s2 }).ToList<string>();
-                    }
-                }
-            );
         }
     }
 

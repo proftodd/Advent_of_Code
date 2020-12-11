@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Shared;
 
 namespace Day_06
 {
@@ -10,13 +11,19 @@ namespace Day_06
         static void Main(string[] args)
         {
             var input = File.ReadAllLines(args[0]);
-            var groupAnswerSets = ParseGroupAnswers(input)
-                .Select(CountAnsweredQuestions)
-                .Select(d => d.Keys.Count());
-            // var stringRep = groupAnswerSets.Aggregate("", (x, y) => x + " + " + y);
-            var answeredSum = groupAnswerSets.Sum();
-            // Console.WriteLine($"Sum of answered question sets: {stringRep} = {answeredSum}");
-            Console.WriteLine($"Sum of answered question sets: {answeredSum}");
+            var groupAnswerSets = CollectionUtils.CollectRecords(input)
+                .Select(l => l.Split())
+                .Select(ls => ls.Select(s => CountAnsweredQuestions(s)));
+            var anyAnswered = groupAnswerSets.Select(ld => ld.Aggregate((d, d1) => {
+                var nd = new Dictionary<char, int>(d);
+                foreach (var c in d1.Keys)
+                {
+                    nd.TryAdd(c, d1[c]);
+                }
+                return nd;
+            }));
+            var anyAnsweredCount = anyAnswered.Select(d => d.Keys.Count()).Sum();
+            Console.WriteLine($"Sum of answered question sets: {anyAnsweredCount}");
         }
 
         public static List<string> ParseGroupAnswers(string[] lines)
