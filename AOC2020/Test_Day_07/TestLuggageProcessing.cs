@@ -49,21 +49,5 @@ namespace Day_07
             var cargo = new Bag("blue", "light");
             Assert.AreEqual(new HashSet<Bag>(), cargo.GetTransitiveContainers(cargo));
         }
-
-        [Test]
-        public void It_counts_transitive_containers_correctly()
-        {
-            var cargo = new Bag("blue", "light");
-            var container1 = new Bag("red", "dark");
-            var container2 = new Bag("green", "forest");
-            var container3 = new Bag("yellow", "sunny");
-            cargo.SetContainedBy(container1);
-            cargo.SetContainedBy(container2);
-            container1.SetContainedBy(container3);
-            ISet<Bag> expectedContainers = new HashSet<Bag>(new[] { container1, container2, container3 });
-            var transitiveContainers = cargo.GetTransitiveContainers(cargo);
-            transitiveContainers.ExceptWith(expectedContainers);
-            Assert.AreEqual(0, transitiveContainers.Count);
-        }
     }
 }

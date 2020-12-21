@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace Day_07
@@ -48,6 +49,42 @@ namespace Day_07
 
             Assert.IsTrue(cargo.CanBeIn(new Bag("blue", "light")));
             Assert.IsFalse(cargo.CanBeIn(new Bag("red", "light")));
+        }
+
+        [Test]
+        public void It_counts_transitive_containers_correctly()
+        {
+            var cargo = new Bag("blue", "light");
+            var container1 = new Bag("red", "dark");
+            var container2 = new Bag("green", "forest");
+            var container3 = new Bag("yellow", "sunny");
+            cargo.SetContainedBy(container1);
+            cargo.SetContainedBy(container2);
+            container1.SetContainedBy(container3);
+            ISet<Bag> expectedContainers = new HashSet<Bag>(new[] { container1, container2, container3 });
+            var transitiveContainers = cargo.GetTransitiveContainers(cargo);
+            transitiveContainers.ExceptWith(expectedContainers);
+            Assert.AreEqual(0, transitiveContainers.Count);
+        }
+
+        [Test]
+        public void Bag_reports_zero_contents_if_it_contains_no_other_bags()
+        {
+            Bag bag = new Bag("blue", "light");
+            Assert.AreEqual(0, bag.GetTransitiveContentCount());
+        }
+
+        [Test]
+        public void Bag_reports_correct_transitive_content_count()
+        {
+            var cargo = new Bag("blue", "light");
+            var container1 = new Bag("red", "dark");
+            var container2 = new Bag("green", "forest");
+            var container3 = new Bag("yellow", "sunny");
+            container1.AddCargo(cargo, 2);
+            container2.AddCargo(cargo, 2);
+            container3.AddCargo(container1, 2);
+            Assert.AreEqual(6, container3.GetTransitiveContentCount());
         }
     }
 }

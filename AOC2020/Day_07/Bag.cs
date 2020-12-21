@@ -5,7 +5,7 @@ namespace Day_07
 {
     public class Bag : IEquatable<Bag>, IComparable<Bag>
     {
-        private readonly Dictionary<Bag, int> _canContain;
+        private readonly IDictionary<Bag, int> _canContain;
         private readonly ISet<Bag> _canBeIn;
 
         public Bag(string color, string modifier)
@@ -25,7 +25,7 @@ namespace Day_07
             _canContain.Add(bag, number);
         }
 
-        public Dictionary<Bag, int> GetCargo()
+        public IDictionary<Bag, int> GetCargo()
         {
             return _canContain;
         }
@@ -118,6 +118,19 @@ namespace Day_07
                 ret.UnionWith(myContainer.GetTransitiveContainers(baseBag));
             }
             return ret;
+        }
+
+        public int GetTransitiveContentCount()
+        {
+            var transitiveCount = 0;
+            foreach (var kvp in _canContain)
+            {
+                var bag = kvp.Key;
+                var count = kvp.Value;
+                transitiveCount += count;
+                transitiveCount += count * bag.GetTransitiveContentCount();
+            }
+            return transitiveCount;
         }
     }
 }

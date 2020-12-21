@@ -66,7 +66,9 @@ namespace Day_07
             //     Console.WriteLine($"\tcan be contained by {b}");
             // }
             var transitiveContainers = shinyGold.GetTransitiveContainers(shinyGold);
+            var transitiveContainerCount = shinyGold.GetTransitiveContentCount();
             Console.WriteLine($"{shinyGold} can be contained by {transitiveContainers.Count} other bags");
+            Console.WriteLine($"{shinyGold} can contain {transitiveContainerCount} bags");
         }
 
         public static ValueTuple<Bag, Dictionary<Bag, int>> ParseLuggageProcessingInstruction(Dictionary<(string, string), Bag> bagList, string instruction)
