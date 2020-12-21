@@ -36,6 +36,10 @@ namespace Day_08
 
         public int Step()
         {
+            if (address >= instructions.Length)
+            {
+                return accumulator;
+            }
             var instruction = instructions[address];
             var (inst, arg) = ParseInstruction(instruction);
             // System.Console.WriteLine($"executing |{instruction}| address {address} accumulator {accumulator} inst {inst} arg {arg}");
