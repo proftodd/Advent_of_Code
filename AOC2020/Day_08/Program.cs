@@ -20,13 +20,12 @@ namespace Day_08
             }
             System.Console.WriteLine($"console repeats address {console.Address} with accumulator {console.Accumulator}");
 
-            var jumps = program.Select((inst, index) => (inst, index)).Where(t => t.Item1.StartsWith("jmp"));
-            var noops = program.Select((inst, index) => (inst, index)).Where(t => t.Item1.StartsWith("nop"));
+            var subs = program.Select((inst, index) => (inst, index)).Where(t => t.Item1.StartsWith("jmp") || t.Item1.StartsWith("nop"));
             if (result == 0)
             {
-                foreach (var (inst, i) in jumps)
+                foreach (var (inst, i) in subs)
                 {
-                    var newProgram = SubstituteCommand(program, "nop", i);
+                    var newProgram = SubstituteCommand(program, inst.StartsWith("nop") ? "jmp" : "nop", i);
                     console = new Console(newProgram);
                     addresses.Clear();
                     result = 0;
@@ -38,26 +37,7 @@ namespace Day_08
                     if (result != 0)
                     {
                         System.Console.WriteLine($"program terminated with accumulator {console.Accumulator}");
-                        break;
-                    }
-                }
-            }
-            if (result == 0)
-            {
-                foreach (var (inst, i) in noops)
-                {
-                    var newProgram = SubstituteCommand(program, "jmp", i);
-                    console = new Console(newProgram);
-                    addresses.Clear();
-                    result = 0;
-                    while (!addresses.ContainsKey(console.Address) && result == 0)
-                    {
-                        addresses.Add(console.Address, console.Accumulator);
-                        result = console.Step();
-                    }
-                    if (result != 0)
-                    {
-                        System.Console.WriteLine($"program terminated with accumulator {console.Accumulator}");
+                        System.Console.WriteLine($"\t on line {i} replaced |{inst}| with |{newProgram[i]}|");
                         break;
                     }
                 }
