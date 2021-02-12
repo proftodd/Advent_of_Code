@@ -24,7 +24,7 @@ namespace Day_10
             HandleJoltageDifference(3, differences);
             Console.WriteLine($"{differences[1]} 1 Jolt gaps * {differences[3]} 3 Jolt gaps = {differences[1] * differences[3]}");
             var configs = GenerateConfigurations(adapters);
-            Console.WriteLine($"There are {configs.Count} ways to arrange the adapters");
+            Console.WriteLine($"There are {configs.Values.Select(l => l.Count()).Sum()} ways to arrange the adapters");
         }
 
         public static void HandleJoltageDifference(int difference, IDictionary<int, int> countedDifferences)
@@ -43,29 +43,37 @@ namespace Day_10
             }
         }
 
-        public static List<int[]> GenerateConfigurations(int [] adapters)
+        public static IDictionary<int, List<int[]>> GenerateConfigurations(int [] adapters)
         {
-            var ret = new List<int[]>();
-            ret.Add(adapters);
-            for (int i = 0; i < ret.Count; ++i)
+            var ret = new Dictionary<int, List<int[]>>();
+            ret.Add(adapters.Length, new[] { adapters }.ToList());
+            for (int i = adapters.Length; i > 0; --i)
             {
-                var thisList = ret[i];
-                // Console.WriteLine($"checking {string.Join(',', thisList.Select(a => a.ToString()))}");
-                for (int j = 0; j < thisList.Count() - 1; ++j)
+                if (ret[i].Count == 0)
                 {
-                    var prev = j == 0 ? 0 : thisList[j - 1];
-                    var next = thisList[j + 1];
-                    if (next - prev <= 3)
+                    break;
+                }
+                var listOfOneShorterLists = new List<int[]>();
+                ret.Add(i - 1, listOfOneShorterLists);
+                foreach (var thisList in ret[i])
+                {
+                    // Console.WriteLine($"checking {string.Join(',', thisList.Select(a => a.ToString()))}");
+                    for (int j = 0; j < thisList.Length - 1; ++j)
                     {
-                        var shortenedList = thisList.Where((k, l) => l != j).ToArray();
-                        // Console.WriteLine($"\tRemoving thisList[{j}] = {thisList[j]}, adding {string.Join(',', shortenedList)}");
-                        if (!ret.Any(a => a.ElementsAreEqual(shortenedList)))
+                        var prev = j == 0 ? 0 : thisList[j - 1];
+                        var next = thisList[j + 1];
+                        if (next - prev <= 3)
                         {
-                            ret.Add(shortenedList);
+                            var shortenedList = thisList.Where((k, l) => l != j).ToArray();
+                            // Console.WriteLine($"\tRemoving thisList[{j}] = {thisList[j]}, adding {string.Join(',', shortenedList)}");
+                            if (!listOfOneShorterLists.Any(a => a.ElementsAreEqual(shortenedList)))
+                            {
+                                listOfOneShorterLists.Add(shortenedList);
+                            }
                         }
                     }
+                    // break;
                 }
-                // break;
             }
             return ret;
         }
