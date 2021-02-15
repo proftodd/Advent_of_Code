@@ -74,6 +74,7 @@ namespace Day_10
                     }
                     // break;
                 }
+                Console.WriteLine($"There are {ret[i].Count()} combinations of length {i}.");
             }
             return ret;
         }
