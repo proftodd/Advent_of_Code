@@ -23,8 +23,7 @@ namespace Day_10
             }
             HandleJoltageDifference(3, differences);
             Console.WriteLine($"{differences[1]} 1 Jolt gaps * {differences[3]} 3 Jolt gaps = {differences[1] * differences[3]}");
-            var configs = GenerateConfigurations(adapters);
-            Console.WriteLine($"There are {configs.Values.Select(l => l.Count()).Sum()} ways to arrange the adapters");
+            Console.WriteLine($"There are {CountConfigurations(adapters)} ways to arrange the adapters");
         }
 
         public static void HandleJoltageDifference(int difference, IDictionary<int, int> countedDifferences)
@@ -43,7 +42,7 @@ namespace Day_10
             }
         }
 
-        public static IDictionary<int, List<int[]>> GenerateConfigurations(int [] adapters)
+        public static long CountConfigurations(int [] adapters)
         {
             var ret = new Dictionary<int, List<int[]>>();
             ret.Add(adapters.Length, new[] { adapters }.ToList());
@@ -76,7 +75,7 @@ namespace Day_10
                 }
                 Console.WriteLine($"There are {ret[i].Count()} combinations of length {i}.");
             }
-            return ret;
+            return ret.Values.Select(l => l.Count()).Sum();
         }
     }
 }
