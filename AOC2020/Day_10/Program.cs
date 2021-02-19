@@ -44,17 +44,13 @@ namespace Day_10
 
         public static long CountConfigurations(int [] adapters)
         {
-            var ret = new Dictionary<int, List<int[]>>();
-            ret.Add(adapters.Length, new[] { adapters }.ToList());
-            for (int i = adapters.Length; i > 0; --i)
+            List<int[]> currentConfigurationList = new List<int[]>(new[] { adapters });
+            List<int[]> listOfOneShorterConfigurations;
+            long configurationCount = 1;
+            while (currentConfigurationList.LongCount() > 0L)
             {
-                if (ret[i].Count == 0)
-                {
-                    break;
-                }
-                var listOfOneShorterLists = new List<int[]>();
-                ret.Add(i - 1, listOfOneShorterLists);
-                foreach (var thisList in ret[i])
+                listOfOneShorterConfigurations = new List<int[]>();
+                foreach (var thisList in currentConfigurationList)
                 {
                     // Console.WriteLine($"checking {string.Join(',', thisList.Select(a => a.ToString()))}");
                     for (int j = 0; j < thisList.Length - 1; ++j)
@@ -65,17 +61,22 @@ namespace Day_10
                         {
                             var shortenedList = thisList.Where((k, l) => l != j).ToArray();
                             // Console.WriteLine($"\tRemoving thisList[{j}] = {thisList[j]}, adding {string.Join(',', shortenedList)}");
-                            if (!listOfOneShorterLists.Any(a => a.ElementsAreEqual(shortenedList)))
+                            if (!listOfOneShorterConfigurations.Any(a => a.ElementsAreEqual(shortenedList)))
                             {
-                                listOfOneShorterLists.Add(shortenedList);
+                                listOfOneShorterConfigurations.Add(shortenedList);
                             }
                         }
                     }
                     // break;
                 }
-                Console.WriteLine($"There are {ret[i].Count()} combinations of length {i}.");
+                if (listOfOneShorterConfigurations.LongCount() > 0L)
+                {
+                    Console.WriteLine($"There are {listOfOneShorterConfigurations.LongCount()} combinations of length {listOfOneShorterConfigurations[0].Length}.");
+                }
+                configurationCount += listOfOneShorterConfigurations.LongCount();
+                currentConfigurationList = listOfOneShorterConfigurations;
             }
-            return ret.Values.Select(l => l.Count()).Sum();
+            return configurationCount;
         }
     }
 }
