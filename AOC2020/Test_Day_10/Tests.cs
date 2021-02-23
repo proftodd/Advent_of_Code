@@ -6,12 +6,6 @@ namespace Day_10
 {
     public class Tests
     {
-        [SetUp]
-        public void SetUp()
-        {
-            Program.resultSet.Clear();
-        }
-
         [Test]
         public void It_counts_combinations_correctly_for_first_test_input()
         {

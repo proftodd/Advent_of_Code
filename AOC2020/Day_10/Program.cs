@@ -45,38 +45,40 @@ namespace Day_10
             }
         }
 
-        public static Dictionary<long, long> resultSet = new Dictionary<long, long>();
-
         // Hat tip to Djolence Tipic for the algorithm to use
         // https://github.com/DjolenceTipic/Advent-of-Code/blob/main/Advent-of-Code-2020/day-10/Program.cs
         public static long CountConfigurations(int[] adapters)
         {
-            if (resultSet.ContainsKey(adapters.Length))
+            static long CountConfigurationsRecurse(int[] adapters, Dictionary<long, long> resultSet)
             {
-                return resultSet[adapters.Length];
-            }
-
-            if (adapters.Length == 1)
-            {
-                return 1;
-            }
-
-            long total = 0;
-            for (int i = 1; i < adapters.Length; ++i)
-            {
-                if (adapters[i] - adapters[0] <= 3)
+                if (resultSet.ContainsKey(adapters.Length))
                 {
-                    total += CountConfigurations(adapters[i..]);
+                    return resultSet[adapters.Length];
                 }
-                else
+
+                if (adapters.Length == 1)
                 {
-                    break;
+                    return 1;
                 }
+
+                long myTotal = 0;
+                for (int i = 1; i < adapters.Length; ++i)
+                {
+                    if (adapters[i] - adapters[0] <= 3)
+                    {
+                        myTotal += CountConfigurationsRecurse(adapters[i..], resultSet);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                resultSet.Add(adapters.Length, myTotal);
+                return myTotal;
             }
 
-            resultSet.Add(adapters.Length, total);
-
-            return total;
+            return CountConfigurationsRecurse(adapters, new Dictionary<long, long>());
         }
     }
 }
