@@ -10,13 +10,16 @@ namespace Day_10
     {
         public static void Main(string[] args)
         {
-            var adapters = File.ReadLines(args[0])
+            var adapterList = File.ReadLines(args[0])
                 .Select(int.Parse)
-                .ToArray();
-            Array.Sort(adapters);
+                .OrderBy(a => a)
+                .ToList();
+            adapterList.Add(adapterList.Last() + 3);
+            adapterList.Insert(0, 0);
+            var adapters = adapterList.ToArray();
             var differences = new Dictionary<int, int>();
-            HandleJoltageDifference(adapters[0], differences);
-            for (int i = 0; i < adapters.Length - 1; ++i)
+            HandleJoltageDifference(adapters[1], differences);
+            for (int i = 1; i < adapters.Length - 2; ++i)
             {
                 var difference = adapters[i + 1] - adapters[i];
                 HandleJoltageDifference(difference, differences);
@@ -42,41 +45,38 @@ namespace Day_10
             }
         }
 
-        public static long CountConfigurations(int [] adapters)
+        public static Dictionary<long, long> resultSet = new Dictionary<long, long>();
+
+        // Hat tip to Djolence Tipic for the algorithm to use
+        // https://github.com/DjolenceTipic/Advent-of-Code/blob/main/Advent-of-Code-2020/day-10/Program.cs
+        public static long CountConfigurations(int[] adapters)
         {
-            List<int[]> currentConfigurationList = new List<int[]>(new[] { adapters });
-            List<int[]> listOfOneShorterConfigurations;
-            long configurationCount = 1;
-            while (currentConfigurationList.LongCount() > 0L)
+            if (resultSet.ContainsKey(adapters.Length))
             {
-                listOfOneShorterConfigurations = new List<int[]>();
-                foreach (var thisList in currentConfigurationList)
-                {
-                    // Console.WriteLine($"checking {string.Join(',', thisList.Select(a => a.ToString()))}");
-                    for (int j = 0; j < thisList.Length - 1; ++j)
-                    {
-                        var prev = j == 0 ? 0 : thisList[j - 1];
-                        var next = thisList[j + 1];
-                        if (next - prev <= 3)
-                        {
-                            var shortenedList = thisList.Where((k, l) => l != j).ToArray();
-                            // Console.WriteLine($"\tRemoving thisList[{j}] = {thisList[j]}, adding {string.Join(',', shortenedList)}");
-                            if (!listOfOneShorterConfigurations.Any(a => a.ElementsAreEqual(shortenedList)))
-                            {
-                                listOfOneShorterConfigurations.Add(shortenedList);
-                            }
-                        }
-                    }
-                    // break;
-                }
-                if (listOfOneShorterConfigurations.LongCount() > 0L)
-                {
-                    Console.WriteLine($"There are {listOfOneShorterConfigurations.LongCount()} combinations of length {listOfOneShorterConfigurations[0].Length}.");
-                }
-                configurationCount += listOfOneShorterConfigurations.LongCount();
-                currentConfigurationList = listOfOneShorterConfigurations;
+                return resultSet[adapters.Length];
             }
-            return configurationCount;
+
+            if (adapters.Length == 1)
+            {
+                return 1;
+            }
+
+            long total = 0;
+            for (int i = 1; i < adapters.Length; ++i)
+            {
+                if (adapters[i] - adapters[0] <= 3)
+                {
+                    total += CountConfigurations(adapters[i..]);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            resultSet.Add(adapters.Length, total);
+
+            return total;
         }
     }
 }
