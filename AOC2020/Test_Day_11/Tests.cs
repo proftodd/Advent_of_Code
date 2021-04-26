@@ -37,13 +37,13 @@ namespace Day_11
             char[][] expectedNextFloorPlan;
             for (int k = 2; k <= 6; ++k)
             {
-                observedNextFloorPlan = Program.Iterate(floorPlan);
+                observedNextFloorPlan = Program.Iterate(floorPlan, Program.AdjacentSeatCriterion);
                 expectedNextFloorPlan = Program.ReadFloorPlan($"test{k}.txt");
                 Assert.IsTrue(Program.AreSame(expectedNextFloorPlan, observedNextFloorPlan));
                 floorPlan = observedNextFloorPlan;
             }
 
-            observedNextFloorPlan = Program.Iterate(floorPlan);
+            observedNextFloorPlan = Program.Iterate(floorPlan, Program.AdjacentSeatCriterion);
             Assert.IsTrue(Program.AreSame(floorPlan, observedNextFloorPlan));
 
             Assert.AreEqual(37, Program.CountOccupiedChairs(floorPlan));

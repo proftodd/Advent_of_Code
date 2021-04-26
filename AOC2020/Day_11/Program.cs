@@ -13,7 +13,7 @@ namespace Day_11
             do
             {
                 floorPlan = nextFloorPlan;
-                nextFloorPlan = Iterate(floorPlan);
+                nextFloorPlan = Iterate(floorPlan, AdjacentSeatCriterion);
             }
             while (!AreSame(floorPlan, nextFloorPlan));
 
@@ -52,6 +52,41 @@ namespace Day_11
             return floorPlan.Select(r => r.Where(p => p == '#').Count()).Sum();
         }
 
+        public static char[][] Iterate(char[][] floorPlan, Func<char[][], int, int, char> seatCriterion)
+        {
+            var ret = new char[floorPlan.Length][];
+            for (int i = 0; i < floorPlan.Length; ++i)
+            {
+                ret[i] = new char[floorPlan[i].Length];
+                for (int j = 0; j < floorPlan[i].Length; ++j)
+                {
+                    ret[i][j] = seatCriterion(floorPlan, i, j);
+                }
+            }
+            return ret;
+        }
+
+        public static char AdjacentSeatCriterion(char[][] floorPlan, int row, int col)
+        {
+            if (floorPlan[row][col] == '.')
+            {
+                return '.';
+            }
+            int filledSeatCount = CountAdjacentFilledSeats(floorPlan, row, col);
+            if (floorPlan[row][col] == 'L' && filledSeatCount == 0)
+            {
+                return '#';
+            }
+            else if (floorPlan[row][col] == '#' && filledSeatCount >= 4)
+            {
+                return 'L';
+            }
+            else
+            {
+                return floorPlan[row][col];
+            }
+        }
+
         public static int CountAdjacentFilledSeats(char[][] floorPlan, int row, int col)
         {
             var chairCount = 0;
@@ -83,38 +118,6 @@ namespace Day_11
                 }
             }
             return chairCount;
-        }
-
-        public static char[][] Iterate(char[][] floorPlan)
-        {
-            var ret = new char[floorPlan.Length][];
-            int adjacentFilledSeatCount;
-            for (int i = 0; i < floorPlan.Length; ++i)
-            {
-                ret[i] = new char[floorPlan[i].Length];
-                for (int j = 0; j < floorPlan[i].Length; ++j)
-                {
-                    if (floorPlan[i][j] == '.')
-                    {
-                        ret[i][j] = '.';
-                    } 
-                    adjacentFilledSeatCount = CountAdjacentFilledSeats(floorPlan, i, j);
-                    if (floorPlan[i][j] == 'L' && adjacentFilledSeatCount == 0)
-                    {
-                        ret[i][j] = '#';
-                    }
-                    else if (floorPlan[i][j] == '#' && adjacentFilledSeatCount >= 4)
-                    {
-                        ret[i][j] = 'L';
-                    }
-                    else
-                    {
-                        ret[i][j] = floorPlan[i][j];
-                    }
-
-                }
-            }
-            return ret;
         }
     }
 }
