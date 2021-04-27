@@ -8,16 +8,26 @@ namespace Day_11
     {
         static void Main(string[] args)
         {
-            var floorPlan = ReadFloorPlan(args[0]);
-            var nextFloorPlan = floorPlan;
+            var initialFloorPlan = ReadFloorPlan(args[0]);
+            char[][] floorPlan, nextFloorPlan;
+
+            nextFloorPlan = initialFloorPlan;
             do
             {
                 floorPlan = nextFloorPlan;
                 nextFloorPlan = Iterate(floorPlan, AdjacentSeatCriterion);
             }
             while (!AreSame(floorPlan, nextFloorPlan));
+            Console.WriteLine($"Adjacent seats: When stable, there are {CountOccupiedChairs(nextFloorPlan)} filled seats");
 
-            Console.WriteLine($"When stable, there are {CountOccupiedChairs(nextFloorPlan)} filled seats");
+            nextFloorPlan = initialFloorPlan;
+            do
+            {
+                floorPlan = nextFloorPlan;
+                nextFloorPlan = Iterate(floorPlan, VisibleSeatCriterion);
+            }
+            while (!AreSame(floorPlan, nextFloorPlan));
+            Console.WriteLine($"Visible seats: When stable, there are {CountOccupiedChairs(nextFloorPlan)} filled seats");
         }
 
         public static bool AreSame(char[][] fp1, char[][] fp2)
@@ -87,6 +97,27 @@ namespace Day_11
             }
         }
 
+        public static char VisibleSeatCriterion(char[][] floorPlan, int row, int col)
+        {
+            if (floorPlan[row][col] == '.')
+            {
+                return '.';
+            }
+            int filledSeatCount = CountVisibleFilledSeats(floorPlan, row, col);
+            if (floorPlan[row][col] == 'L' && filledSeatCount == 0)
+            {
+                return '#';
+            }
+            else if (floorPlan[row][col] == '#' && filledSeatCount >= 5)
+            {
+                return 'L';
+            }
+            else
+            {
+                return floorPlan[row][col];
+            }
+        }
+
         public static int CountAdjacentFilledSeats(char[][] floorPlan, int row, int col)
         {
             var chairCount = 0;
@@ -118,6 +149,34 @@ namespace Day_11
                 }
             }
             return chairCount;
+        }
+
+        public static int CountVisibleFilledSeats(char[][] floorPlan, int row, int col)
+        {
+            var directions = new ValueTuple<int, int>[] {
+                (0, 1),  (1, 1),   (1, 0),  (1, -1),
+                (0, -1), (-1, -1), (-1, 0), (-1, 1)
+            };
+            return directions.Select(d => CountVisibleSeatsInDirection(floorPlan, row + d.Item1, col + d.Item2, d)).Sum();
+        }
+
+        private static int CountVisibleSeatsInDirection(char[][] floorPlan, int row, int col, ValueTuple<int, int> direction)
+        {
+            if (row < 0 || col < 0 || row >= floorPlan.Length || col >= floorPlan[row].Length)
+            {
+                return 0;
+            }
+            else if (floorPlan[row][col] == '#')
+            {
+                return 1;
+            }
+            else if (floorPlan[row][col] == 'L') {
+                return 0;
+            }
+            else
+            {
+                return CountVisibleSeatsInDirection(floorPlan, row + direction.Item1, col + direction.Item2, direction);
+            }
         }
     }
 }

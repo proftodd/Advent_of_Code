@@ -48,5 +48,16 @@ namespace Day_11
 
             Assert.AreEqual(37, Program.CountOccupiedChairs(floorPlan));
         }
+
+        [Test]
+        public void It_counts_visible_seats_correctly()
+        {
+            var fpa = Program.ReadFloorPlan("testa.txt");
+            Assert.AreEqual(8, Program.CountVisibleFilledSeats(fpa, 4, 3));
+            var fpb = Program.ReadFloorPlan("testb.txt");
+            Assert.AreEqual(0, Program.CountVisibleFilledSeats(fpb, 1, 1));
+            var fpc = Program.ReadFloorPlan("testc.txt");
+            Assert.AreEqual(0, Program.CountVisibleFilledSeats(fpc, 3, 3));
+        }
     }
 }
