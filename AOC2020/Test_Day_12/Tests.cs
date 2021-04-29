@@ -12,7 +12,7 @@ namespace Day_12
             var instructions = File.ReadLines("test.txt");
             foreach (var instruction in instructions)
             {
-                Program.UpdateFerry(ferry, instruction);
+                ferry.Steer(instruction);
             }
             Assert.AreEqual(17, ferry.X);
             Assert.AreEqual(-8, ferry.Y);
@@ -23,13 +23,13 @@ namespace Day_12
         public void It_responds_correctly_to_U_turns()
         {
             var ferry = new Ferry();
-            Program.UpdateFerry(ferry, "L180");
+            ferry.Steer("L180");
             Assert.AreEqual(180, ferry.Heading);
-            Program.UpdateFerry(ferry, "L180");
+            ferry.Steer("L180");
             Assert.AreEqual(0, ferry.Heading);
-            Program.UpdateFerry(ferry, "R180");
+            ferry.Steer("R180");
             Assert.AreEqual(180, ferry.Heading);
-            Program.UpdateFerry(ferry, "R180");
+            ferry.Steer("R180");
             Assert.AreEqual(0, ferry.Heading);
         }
     }
