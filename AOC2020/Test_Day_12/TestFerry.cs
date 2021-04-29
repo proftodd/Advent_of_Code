@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace Day_12
 {
-    public class Tests
+    public class TestFerry
     {
         [Test]
         public void It_responds_correctly_to_example_instructions()
