@@ -16,18 +16,7 @@ namespace Day_12
             get { return heading; }
             set
             {
-                if (value < 0)
-                {
-                    heading = value + 360;
-                }
-                else if (value >= 360)
-                {
-                    heading = value % 360;
-                }
-                else
-                {
-                    heading = value;
-                }
+                heading = NormalizeHeading(value);
             }
         }
 
@@ -50,60 +39,30 @@ namespace Day_12
                     Y -= argument;
                     break;
                 case 'L':
-                    //Console.WriteLine($"Currently facing {ferry.Heading}");
-                    //Console.WriteLine($"Current state: {ferry.Heading}@({ferry.X},{ferry.Y})");
-                    //Console.WriteLine($"Changing heading by {argument} to port");
-                    Heading = Heading + argument;
-                    //Console.WriteLine($"New state: {ferry.Heading}@({ferry.X},{ferry.Y})");
-                    //Console.WriteLine();
+                    Heading += argument;
                     break;
                 case 'R':
-                    //Console.WriteLine($"Currently facing {ferry.Heading}");
-                    //Console.WriteLine($"Current state: {ferry.Heading}@({ferry.X},{ferry.Y})");
-                    //Console.WriteLine($"Changing heading by {argument} to starboard");
-                    Heading = Heading - argument;
-                    //Console.WriteLine($"New state: {ferry.Heading}@({ferry.X},{ferry.Y})");
-                    //Console.WriteLine();
+                    Heading -= argument;
                     break;
                 case 'F':
                     if (Heading == 0)
                     {
-                        //Console.WriteLine($"Currently facing {ferry.Heading}");
-                        //Console.WriteLine($"Current state: {ferry.Heading}@({ferry.X},{ferry.Y})");
-                        //Console.WriteLine($"Changing position by {argument}");
                         X += argument;
-                        //Console.WriteLine($"New state: {ferry.Heading}@({ferry.X},{ferry.Y})");
-                        //Console.WriteLine();
                         break;
                     }
                     else if (Heading == 90)
                     {
-                        //Console.WriteLine($"Currently facing {ferry.Heading}");
-                        //Console.WriteLine($"Current state: {ferry.Heading}@({ferry.X},{ferry.Y})");
-                        //Console.WriteLine($"Changing position by {argument}");
                         Y += argument;
-                        //Console.WriteLine($"New state: {ferry.Heading}@({ferry.X},{ferry.Y})");
-                        //Console.WriteLine();
                         break;
                     }
                     else if (Heading == 180)
                     {
-                        //Console.WriteLine($"Currently facing {ferry.Heading}");
-                        //Console.WriteLine($"Current state: {ferry.Heading}@({ferry.X},{ferry.Y})");
-                        //Console.WriteLine($"Changing position by {argument}");
                         X -= argument;
-                        //Console.WriteLine($"New state: {ferry.Heading}@({ferry.X},{ferry.Y})");
-                        //Console.WriteLine();
                         break;
                     }
                     else if (Heading == 270)
                     {
-                        //Console.WriteLine($"Currently facing {ferry.Heading}");
-                        //Console.WriteLine($"Current state: {ferry.Heading}@({ferry.X},{ferry.Y})");
-                        //Console.WriteLine($"Changing position by {argument}");
                         Y -= argument;
-                        //Console.WriteLine($"New state: {ferry.Heading}@({ferry.X},{ferry.Y})");
-                        //Console.WriteLine();
                         break;
                     }
                     else
@@ -113,6 +72,11 @@ namespace Day_12
                 default:
                     throw new Exception($"Unrecognized instruction: {instruction}");
             }
+        }
+
+        public override string ToString()
+        {
+            return $"Ferry Bearing {Heading}@({X},{Y})";
         }
     }
 }
