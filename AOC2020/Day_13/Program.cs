@@ -20,27 +20,26 @@ namespace Day_13
                 .Aggregate((0, int.MaxValue), (curSmallest, t) => curSmallest.Item2 > t.Item2 ? t : curSmallest);
             Console.WriteLine($"bus({theBus}) * time difference({timeDifference}) = {theBus * timeDifference}");
 
-            var (greatestPeriod, index) = buses
+            var importantBuses = buses
                 .Select((b, i) => (b, i))
                 .Where(t => t.Item1 != 0)
-                .Aggregate((int.MinValue, -1), (curLargest, t) => curLargest.Item1 < t.Item1 ? t : curLargest);
+                .OrderByDescending(t => t.Item1)
+                .ToArray();
+            //Console.WriteLine($"Important buses: {string.Join('|', importantBuses)}");
+            var (greatestPeriod, index) = importantBuses.First();
             Console.WriteLine($"The bus with the greatest period is {greatestPeriod} with index {index}");
             long theTimestamp = greatestPeriod;
             while (true)
             {
                 int i;
-                for (i = 0; i < buses.Length; ++i)
+                for (i = 1; i < importantBuses.Length; ++i)
                 {
-                    if (buses[i] == 0)
-                    {
-                        continue;
-                    }
-                    if ((theTimestamp - (index - i)) % buses[i] != 0)
+                    if ((theTimestamp - (index - importantBuses[i].Item2)) % importantBuses[i].Item1 != 0)
                     {
                         break;
                     }
                 }
-                if (i == buses.Length)
+                if (i == importantBuses.Length)
                 {
                     break;
                 }
