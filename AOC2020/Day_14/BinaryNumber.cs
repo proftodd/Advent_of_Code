@@ -13,7 +13,7 @@
         {
             for (int i = 0; i < _binaryRepresentation.Length; ++i)
             {
-                _binaryRepresentation[i] = (int)(number % 2);
+                _binaryRepresentation[_binaryRepresentation.Length - i - 1] = (int)(number % 2);
                 number /= 2;
             }
         }
@@ -21,7 +21,7 @@
         public long ToLong()
         {
             var ret = 0L;
-            for (int i = _binaryRepresentation.Length - 1; i >= 0; --i)
+            for (int i = 0; i < _binaryRepresentation.Length; ++i)
             {
                 ret *= 2;
                 ret += _binaryRepresentation[i];

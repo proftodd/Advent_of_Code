@@ -17,7 +17,7 @@ namespace Day_14
             var output = new BinaryNumber();
             for (int i = 0; i < rawInput.Length; ++i)
             {
-                output[i] = characters[output.Length - i - 1] switch
+                output[i] = characters[i] switch
                 {
                     'X' => rawInput[i],
                     '1' => 1,
