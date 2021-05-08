@@ -13,5 +13,14 @@ namespace Day_14
             computer.Run(program);
             Assert.AreEqual(165, computer.SumMemory());
         }
+
+        [Test]
+        public void It_runs_v2_test_program_correctly()
+        {
+            var computer = new DockComputer();
+            var program = File.ReadAllLines("test2.txt");
+            computer.RunV2(program);
+            Assert.AreEqual(208, computer.SumMemory());
+        }
     }
 }

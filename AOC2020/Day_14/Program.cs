@@ -7,9 +7,15 @@ namespace Day_14
     {
         static void Main(string[] args)
         {
-            var computer = new DockComputer();
+            DockComputer computer;
             var program = File.ReadLines(args[0]);
+
+            computer = new DockComputer();
             computer.Run(program);
+            Console.WriteLine($"Sum of values in memory: [{computer.SumMemory()}]");
+
+            computer = new DockComputer();
+            computer.RunV2(program);
             Console.WriteLine($"Sum of values in memory: [{computer.SumMemory()}]");
         }
     }

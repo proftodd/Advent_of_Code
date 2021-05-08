@@ -29,12 +29,17 @@
             return ret;
         }
 
-        public int Length { get => 36; }
+        public static int Length { get => 36; }
 
         public int this [int index]
         {
             get { return _binaryRepresentation[index]; }
             set { _binaryRepresentation[index] = value; }
+        }
+
+        public BinaryNumber Clone()
+        {
+            return new BinaryNumber(this.ToLong());
         }
     }
 }
