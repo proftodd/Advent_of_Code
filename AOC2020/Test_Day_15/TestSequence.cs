@@ -49,19 +49,25 @@ namespace Day_15
         [Test]
         public void It_runs_correctly()
         {
-            int[] seed;
+            Sequence sequence;
 
-            seed = new[] { 0, 3, 6 };
-            Assert.AreEqual(6, new Sequence(seed).FindNthNumber(3));
-            Assert.AreEqual(0, new Sequence(seed).FindNthNumber(10));
-            Assert.AreEqual(436, new Sequence(seed).FindNthNumber(2020));
+            sequence = new Sequence(new[] { 0, 3, 6 });
+            Assert.AreEqual(6, sequence.FindNthNumber(3));
+            Assert.AreEqual(0, sequence.FindNthNumber(10));
+            Assert.AreEqual(436, sequence.FindNthNumber(2020));
+        }
 
-            Assert.AreEqual(1, new Sequence(new[] { 1, 3, 2 }).FindNthNumber(2020));
-            Assert.AreEqual(10, new Sequence(new[] { 2, 1, 3 }).FindNthNumber(2020));
-            Assert.AreEqual(27, new Sequence(new[] { 1, 2, 3 }).FindNthNumber(2020));
-            Assert.AreEqual(78, new Sequence(new[] { 2, 3, 1 }).FindNthNumber(2020));
-            Assert.AreEqual(438, new Sequence(new[] { 3, 2, 1 }).FindNthNumber(2020));
-            Assert.AreEqual(1836, new Sequence(new[] { 3, 1, 2 }).FindNthNumber(2020));
+        [TestCase(new int[] { 1, 3, 2 }, 1)]
+        [TestCase(new int[] { 2, 1, 3 }, 10)]
+        [TestCase(new int[] { 1, 2, 3 }, 27)]
+        [TestCase(new int[] { 2, 3, 1 }, 78)]
+        [TestCase(new int[] { 3, 2, 1 }, 438)]
+        [TestCase(new int[] { 3, 1, 2 }, 1836)]
+        //[TestCase(new int[] { 3, 1, 2 }, 1837)]
+        public void It_gives_correct_responses_to_example_cases(int[] seed, int lastSaid)
+        {
+            var sequence = new Sequence(seed);
+            Assert.AreEqual(lastSaid, sequence.FindNthNumber(2020));
         }
     }
 }
