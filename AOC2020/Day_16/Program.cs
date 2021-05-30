@@ -8,7 +8,8 @@ namespace Day_16
         static void Main(string[] args)
         {
             var interpreter = new Interpreter(args[0]);
-            var scanningErrorRate = interpreter.ScanErrors()
+            var badTickets = interpreter.ScanErrors();
+            var scanningErrorRate = badTickets
                 .Select(t => t.Item3)
                 .Sum();
             Console.WriteLine($"Observed scanningErrorRate = {scanningErrorRate}");

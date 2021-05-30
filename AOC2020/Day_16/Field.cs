@@ -44,13 +44,18 @@ namespace Day_16
             get => _validator;
         }
 
+        public bool Validate(int value)
+        {
+            return _validator.Any(v => v.Min <= value && value <= v.Max);
+        }
+
         public IEnumerable<Tuple<Ticket, int, int>> Validate(Ticket ticket)
         {
             return ticket.Fields
                 .Select((value, index) => (Value: value, Index: index))
                 .Select(tf =>
                 {
-                    if (_validator.Any(v => v.Min <= tf.Value && tf.Value <= v.Max))
+                    if (Validate(tf.Value))
                     {
                         return null;
                     }

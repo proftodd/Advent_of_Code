@@ -41,6 +41,10 @@ namespace Day_16
 
         public List<Ticket> NearbyTickets { get => _nearbyTickets; }
 
+        public int FieldCount { get => _fields.Count; }
+
+        public int NearbyTicketCount { get => _nearbyTickets.Count; }
+
         public IEnumerable<Tuple<Ticket, int, int>> ScanErrors()
         {
             var misses = _nearbyTickets
@@ -48,10 +52,10 @@ namespace Day_16
             var pivoted = misses.Select(t =>
             {
                 var myList = new List<List<Tuple<Ticket, int, int>>>();
-                for (int i = 0; i < t[0].Count; ++i)
+                for (int i = 0; i < FieldCount; ++i)
                 {
                     var thisList = new List<Tuple<Ticket, int, int>>();
-                    for (int j = 0; j < t.Count; ++j)
+                    for (int j = 0; j < FieldCount; ++j)
                     {
                         thisList.Add(t[j][i]);
                     }
