@@ -13,6 +13,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Day_15\Day_15.csproj" />
+    <ProjectReference Include="..\..\prod\Day_12\Day_12.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\input\2020\Day_12\*.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

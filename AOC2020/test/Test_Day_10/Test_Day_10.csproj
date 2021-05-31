@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -13,7 +12,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Day_08\Day_08.csproj" />
+    <ProjectReference Include="..\..\prod\Day_10\Day_10.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\input\2020\Day_10\*.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
