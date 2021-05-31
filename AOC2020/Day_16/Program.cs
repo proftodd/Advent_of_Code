@@ -13,6 +13,13 @@ namespace Day_16
                 .Select(t => t.Item3)
                 .Sum();
             Console.WriteLine($"Observed scanningErrorRate = {scanningErrorRate}");
+
+            var scanner = interpreter.CreateScanner();
+            var departureFields = interpreter.Fields.Where(f => f.Name.StartsWith("departure"));
+            long product = departureFields
+                .Select(df => scanner.Scan(interpreter.Ticket, df.Name))
+                .Aggregate(1L, (agg, value) => agg * (long)value);
+            Console.WriteLine($"The product of departure field values is {product}");
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Day_16
@@ -10,6 +10,7 @@ namespace Day_16
         private readonly List<Field> _fields;
         private readonly Ticket _ticket;
         private readonly List<Ticket> _nearbyTickets;
+        private List<Ticket> _goodTickets;
 
         public Interpreter(string filename)
         {
@@ -44,6 +45,18 @@ namespace Day_16
         public int FieldCount { get => _fields.Count; }
 
         public int NearbyTicketCount { get => _nearbyTickets.Count; }
+
+        public List<Ticket> GoodTickets
+        {
+            get
+            {
+                if (_goodTickets == null)
+                {
+                    _goodTickets = NearbyTickets.Where(t => !ScanErrors().Any(bt => bt.Item1 == t)).ToList();
+                }
+                return _goodTickets;
+            }
+        }
 
         public IEnumerable<Tuple<Ticket, int, int>> ScanErrors()
         {
@@ -87,6 +100,48 @@ namespace Day_16
             var reduced = denulled
                 .SelectMany(t => t);
             return reduced;
+        }
+
+        public Scanner CreateScanner()
+        {
+            var dict = new Dictionary<string, int>();
+            List<Field>[] possibleMatches = new List<Field>[_fields.Count];
+            for (int i = 0; i < _fields.Count; ++i)
+            {
+                possibleMatches[i] = new List<Field>();
+                for (int j = 0; j < _fields.Count; ++j)
+                {
+                    if (GoodTickets.All(t => _fields[j].Validate(t.Fields[i])))
+                    {
+                        possibleMatches[i].Add(_fields[j]);
+                    }
+                }
+            }
+
+            while (possibleMatches.Any(pm => pm.Count > 1))
+            {
+                for (int i = 0; i < _fields.Count; ++i)
+                {
+                    if (possibleMatches[i].Count == 1)
+                    {
+                        for (int j = 0; j < _fields.Count; ++j)
+                        {
+                            if (i == j)
+                            {
+                                continue;
+                            }
+                            possibleMatches[j].Remove(possibleMatches[i][0]);
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < _fields.Count; ++i)
+            {
+                dict.Add(possibleMatches[i][0].Name, i);
+            }
+
+            return new Scanner(dict);
         }
     }
 }

@@ -27,5 +27,16 @@ namespace Day_16
             };
             Assert.IsTrue(interpreter.ScanErrors().Zip(expectedErrors).All(t => t.Item1.Item2 == t.Item2.Item2 && t.Item1.Item3 == t.Item2.Item3));
         }
+
+        [Test]
+        public void It_creates_correct_scanner()
+        {
+            var interpreter = new Interpreter("test2.txt");
+            var scanner = interpreter.CreateScanner();
+            var ticket = new Ticket("11,12,13");
+            Assert.AreEqual(12, scanner.Scan(ticket, "class"));
+            Assert.AreEqual(11, scanner.Scan(ticket, "row"));
+            Assert.AreEqual(13, scanner.Scan(ticket, "seat"));
+        }
     }
 }
