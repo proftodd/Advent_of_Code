@@ -7,3 +7,9 @@ test('it moves correctly', () => {
     submarine.move(directions)
     expect(submarine.checkSum()).toBe(150)
 })
+
+test('enhanced move is correct', () => {
+    const submarine = new Submarine()
+    submarine.enhancedMove(directions)
+    expect(submarine.checkSum()).toBe(900)
+})
