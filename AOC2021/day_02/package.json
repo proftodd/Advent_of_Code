@@ -1,0 +1,14 @@
+{
+  "name": "day_02",
+  "version": "1.0.0",
+  "description": "Day 2 of Advent of Code 2021",
+  "main": "bin/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^27.4.4"
+  }
+}
