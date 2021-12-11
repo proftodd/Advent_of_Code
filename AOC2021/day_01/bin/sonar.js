@@ -1,4 +1,4 @@
-function scan(readings) {
+exports.scan = function (readings) {
     let previousDepth = parseInt(readings[0])
     // console.log(`initial depth: ${previousDepth}`)
     let depthIncreases = 0
@@ -15,4 +15,20 @@ function scan(readings) {
     return depthIncreases
 }
 
-exports.scan = scan
+exports.scanWindow = function (readings) {
+    const numericReadings = readings.map(r => parseInt(r))
+    let previousWindow = numericReadings.slice(0, 3)
+    // console.log(`first window = ${previousWindow}`)
+    let depthIncreases = 0
+
+    for (let i = 1; i < readings.length - 2; ++i) {
+        var currentWindow = numericReadings.slice(i, i + 3)
+        // console.log(`currentWindow = ${currentWindow}`)
+        if (currentWindow.reduce((a, b) => a + b, 0) > previousWindow.reduce((a, b) => a + b, 0)) {
+            ++depthIncreases
+        }
+        previousWindow = currentWindow
+    }
+
+    return depthIncreases
+}
