@@ -1,4 +1,4 @@
-exports.scan = function (readings) {
+const scan = (readings) => {
     let previousDepth = parseInt(readings[0])
     // console.log(`initial depth: ${previousDepth}`)
     let depthIncreases = 0
@@ -15,7 +15,7 @@ exports.scan = function (readings) {
     return depthIncreases
 }
 
-exports.scanWindow = function (readings) {
+const scanWindow = (readings) => {
     const numericReadings = readings.map(r => parseInt(r))
     let previousWindow = numericReadings.slice(0, 3)
     // console.log(`first window = ${previousWindow}`)
@@ -32,3 +32,5 @@ exports.scanWindow = function (readings) {
 
     return depthIncreases
 }
+
+module.exports = { scan, scanWindow }
