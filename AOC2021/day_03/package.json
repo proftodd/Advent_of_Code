@@ -1,0 +1,14 @@
+{
+  "name": "day_03",
+  "version": "1.0.0",
+  "description": "Solution to day 3 of 2021 Advent of Code",
+  "main": "bin/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jest": "^27.4.4"
+  }
+}
