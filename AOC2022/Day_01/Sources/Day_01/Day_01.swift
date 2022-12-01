@@ -38,7 +38,11 @@ public struct Day_01 {
         for (elf, elfPack) in elves {
             elfLoads[elf] = elfPack.reduce(0, +)
         }
-        let maximumLoad = elfLoads.values.max()!
+        var theLoads: [Int] = [Int](elfLoads.values)
+        theLoads.sort(by: >)
+        let maximumLoad = theLoads[0]
+        let sumOfThreeLargestLoads = theLoads[0] + theLoads[1] + theLoads[2]
         print("Maximum load: \(maximumLoad)")
+        print("Sum of three largest loads = \(sumOfThreeLargestLoads)")
     }
 }
