@@ -25,6 +25,8 @@ public struct Day_02 {
         let lines = result.components(separatedBy: .newlines)
 
         let finalScore = Game.scoreCollectionOfGames(games: lines)
+        let finalScoreWithStrategy = Game.scoreCollectionOfGamesWithStrategy(games: lines)
         print("Final score: \(finalScore)")
+        print("Score with strategy: \(finalScoreWithStrategy)")
     }
 }

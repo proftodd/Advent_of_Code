@@ -36,13 +36,24 @@ final class Day_02Tests: XCTestCase {
         XCTAssertEqual(Game.scoreGame(opponent: "C", me: "Z"), 6)
     }
 
+    func testScoreGameWithStrategy() {
+        XCTAssertEqual(Game.scoreGameWithStrategy(opponent: "A", me: "Y"), 4)
+        XCTAssertEqual(Game.scoreGameWithStrategy(opponent: "B", me: "X"), 1)
+        XCTAssertEqual(Game.scoreGameWithStrategy(opponent: "C", me: "Z"), 7)
+    }
+
+    let setOfGames = [
+        "A Y",
+        "B X",
+        "C Z",
+        ""
+    ]
+
     func testScoreCollectionOfGames() {
-        let setOfGames = [
-            "A Y",
-            "B X",
-            "C Z",
-            ""
-        ]
         XCTAssertEqual(Game.scoreCollectionOfGames(games: setOfGames), 15)
+    }
+
+    func testScoreCollectionOfGamesWithStrategy() {
+        XCTAssertEqual(Game.scoreCollectionOfGamesWithStrategy(games: setOfGames), 12)
     }
 }
