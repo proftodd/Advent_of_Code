@@ -54,15 +54,6 @@ public func scoreGame(opponent: Character, me: Character) -> Int {
     return gameScore + myPlay.rawValue
 }
 
-public func scoreCollectionOfGames(games: [String]) -> Int {
-    return games
-        .filter { $0 != "" }
-        .map { $0.components(separatedBy: .whitespaces) }
-        .map { (Character($0[0]), Character($0[1])) }
-        .map { scoreGame(opponent: $0.0, me: $0.1) }
-        .reduce(0, +)
-}
-
 public func determineMyPlay(opponentPlay: Play, myOutcome: Character) -> Play? {
     switch myOutcome {
         case "X":
@@ -90,11 +81,11 @@ public func scoreGameWithStrategy(opponent: Character, me: Character) -> Int {
     return gameScore + myPlay.rawValue
 }
 
-public func scoreCollectionOfGamesWithStrategy(games: [String]) -> Int {
+public func scoreCollectionOfGames(games: [String], scoringMethod: (Character, Character) -> Int) -> Int {
     return games
         .filter { $0 != "" }
         .map { $0.components(separatedBy: .whitespaces) }
         .map { (Character($0[0]), Character($0[1])) }
-        .map { scoreGameWithStrategy(opponent: $0.0, me: $0.1) }
+        .map { scoringMethod($0.0, $0.1) }
         .reduce(0, +)
 }

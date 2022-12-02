@@ -50,10 +50,10 @@ final class Day_02Tests: XCTestCase {
     ]
 
     func testScoreCollectionOfGames() {
-        XCTAssertEqual(Game.scoreCollectionOfGames(games: setOfGames), 15)
+        XCTAssertEqual(Game.scoreCollectionOfGames(games: setOfGames, scoringMethod: Game.scoreGame), 15)
     }
 
     func testScoreCollectionOfGamesWithStrategy() {
-        XCTAssertEqual(Game.scoreCollectionOfGamesWithStrategy(games: setOfGames), 12)
+        XCTAssertEqual(Game.scoreCollectionOfGames(games: setOfGames, scoringMethod: Game.scoreGameWithStrategy), 12)
     }
 }
