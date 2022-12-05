@@ -31,10 +31,20 @@ final class Day_03Tests: XCTestCase {
         "PmmdzqPrVvPwwTWBwg",
         "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn",
         "ttgJtRGJQctTZtZT",
-        "CrZsJsPPZsGzwwsLwLmpwMDw"
+        "CrZsJsPPZsGzwwsLwLmpwMDw",
+        ""
     ]
 
     func testScoreRucksackCollection() {
         XCTAssertEqual(scoreRucksackCollection(lines: lines), 157)
+    }
+
+    func testFindBadge() {
+        XCTAssertEqual(findBadge(rucksackGroup: Array(lines.prefix(3))), Set("r"))
+        XCTAssertEqual(findBadge(rucksackGroup: Array(lines[3...5])), Set("Z"))
+    }
+
+    func testFindAndPrioritizeBadges() {
+        XCTAssertEqual(findAndPrioritizeBadges(lines: lines), 70)
     }
 }
