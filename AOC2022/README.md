@@ -1,3 +1,3 @@
-# Advent of Code 2022
+# AOC2022
 
-This year's langauge is Swift.
+A description of this package.

@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "Day_02",
+    name: "AOC2022",
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
@@ -13,13 +13,19 @@ let package = Package(
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
-            name: "Game",
+            name: "Day_01",
             dependencies: []),
-        .executableTarget(
+        .target(
             name: "Day_02",
-            dependencies: ["Game"]),
+            dependencies: []),
         .testTarget(
             name: "Day_02Tests",
             dependencies: ["Day_02"]),
+        .executableTarget(
+            name: "AOC2022",
+            dependencies: ["Day_01", "Day_02"]),
+        .testTarget(
+            name: "AOC2022Tests",
+            dependencies: ["AOC2022"]),
     ]
 )
