@@ -12,6 +12,10 @@ public struct Interval: Equatable {
     public func contains(_ other: Interval) -> Bool {
         return self.start <= other.start && self.end >= other.end
     }
+
+    public func overlaps(_ other: Interval) -> Bool {
+        return self.start <= other.start && self.end >= other.start
+    }
 }
 
 public func parseLine(_ line: String) -> (Interval, Interval) {
@@ -45,7 +49,9 @@ public struct Day_04 {
             .map { sortIntervals(a: $0.0, b: $0.1) }
         
         let degenerateCount: Int = sortedIntervals.reduce(0) { $1.0.contains($1.1) ? $0 + 1 : $0 }
+        let overlapCount: Int = sortedIntervals.reduce(0) { $1.0.overlaps($1.1) ? $0 + 1 : $0 }
         
         print("Count of intervals that contain the other one: \(degenerateCount)")
+        print("Count of intervals that overlap: \(overlapCount)")
     }
 }
