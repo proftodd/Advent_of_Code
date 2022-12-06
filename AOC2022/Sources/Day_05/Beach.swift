@@ -84,9 +84,19 @@ public class Beach {
     }
 
     func moveCrate(from: Int, to: Int) {
-        let crate = self.stacks[from - 1].remove(at: self.stacks[from - 1].count - 1)
+        let crate = self.stacks[from - 1].removeLast()
         // print("Moving \(crate) from \(from) to \(to)")
         self.stacks[to - 1].append(crate)
+    }
+
+    func moveNCrates(from: Int, to: Int, number: Int) {
+        var pile: [Character] = []
+        for _ in 1...number {
+            pile.append(self.stacks[from - 1].removeLast())
+        }
+        pile.reverse()
+        self.stacks[to - 1] += pile
+        // print("Moved \(pile) from \(from) to \(to)")
     }
 
     public func followInstructions() {
@@ -94,6 +104,16 @@ public class Beach {
             for _ in 1...instruction.number {
                 self.moveCrate(from: instruction.from, to: instruction.to)
             }
+            // for s in self.stacks {
+            //     print(s)
+            // }
+            // print("")
+        }
+    }
+
+    public func followInstructionsWithModernCrane() {
+        for instruction in self.instructions {
+            self.moveNCrates(from: instruction.from, to: instruction.to, number: instruction.number)
             // for s in self.stacks {
             //     print(s)
             // }

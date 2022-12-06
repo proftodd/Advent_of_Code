@@ -48,4 +48,10 @@ final class Day_05Tests: XCTestCase {
         beach.followInstructions()
         XCTAssertEqual(beach.getTopOfAllStacks(), "CMZ")
     }
+
+    func testDirectionsWithModernCrane() {
+        let beach = Beach(lines)
+        beach.followInstructionsWithModernCrane()
+        XCTAssertEqual(beach.getTopOfAllStacks(), "MCD")
+    }
 }

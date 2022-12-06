@@ -5,5 +5,11 @@ public struct Day_05 {
         let tops = beach.getTopOfAllStacks()
 
         print("The tops of the stacks is \(tops)")
+
+        let beach2 = Beach(lines)
+        beach2.followInstructionsWithModernCrane()
+        let tops2 = beach2.getTopOfAllStacks()
+
+        print("The tops of the second beach's stacks is \(tops2)")
     }
 }
