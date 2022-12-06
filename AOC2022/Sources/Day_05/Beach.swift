@@ -83,18 +83,9 @@ public class Beach {
         return self.instructions
     }
 
-    func moveCrate(from: Int, to: Int) {
-        let crate = self.stacks[from - 1].removeLast()
-        // print("Moving \(crate) from \(from) to \(to)")
-        self.stacks[to - 1].append(crate)
-    }
-
-    func moveNCrates(from: Int, to: Int, number: Int) {
-        var pile: [Character] = []
-        for _ in 1...number {
-            pile.append(self.stacks[from - 1].removeLast())
-        }
-        pile.reverse()
+    func moveNCrates(from: Int, to: Int, number: Int = 1) {
+        let pile = Array(self.stacks[from - 1].suffix(number))
+        self.stacks[from - 1] = Array(self.stacks[from - 1].dropLast(number))
         self.stacks[to - 1] += pile
         // print("Moved \(pile) from \(from) to \(to)")
     }
@@ -102,7 +93,7 @@ public class Beach {
     public func followInstructions() {
         for instruction in self.instructions {
             for _ in 1...instruction.number {
-                self.moveCrate(from: instruction.from, to: instruction.to)
+                self.moveNCrates(from: instruction.from, to: instruction.to)
             }
             // for s in self.stacks {
             //     print(s)
