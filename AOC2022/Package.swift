@@ -45,9 +45,15 @@ let package = Package(
         .testTarget(
             name: "Day_06Tests",
             dependencies: ["Day_06"]),
+        .target(
+            name: "Day_07",
+            dependencies: []),
+        .testTarget(
+            name: "Day_07Tests",
+            dependencies: ["Day_07"]),
         .executableTarget(
             name: "AOC2022",
-            dependencies: ["Day_01", "Day_02", "Day_03", "Day_04", "Day_05", "Day_06"]),
+            dependencies: ["Day_01", "Day_02", "Day_03", "Day_04", "Day_05", "Day_06", "Day_07"]),
         .testTarget(
             name: "AOC2022Tests",
             dependencies: ["AOC2022"]),
