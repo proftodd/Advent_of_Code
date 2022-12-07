@@ -10,10 +10,16 @@ final class Day_06Tests: XCTestCase {
     let test_05 = "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw"
 
     func testDoesAThing() {
-        XCTAssertEqual(findMarkerAndPosition(test_01).1, 7)
-        XCTAssertEqual(findMarkerAndPosition(test_02).1, 5)
-        XCTAssertEqual(findMarkerAndPosition(test_03).1, 6)
-        XCTAssertEqual(findMarkerAndPosition(test_04).1, 10)
-        XCTAssertEqual(findMarkerAndPosition(test_05).1, 11)
+        XCTAssertEqual(findMarkerOfSize(signal: test_01, size: 4), 7)
+        XCTAssertEqual(findMarkerOfSize(signal: test_02, size: 4), 5)
+        XCTAssertEqual(findMarkerOfSize(signal: test_03, size: 4), 6)
+        XCTAssertEqual(findMarkerOfSize(signal: test_04, size: 4), 10)
+        XCTAssertEqual(findMarkerOfSize(signal: test_05, size: 4), 11)
+
+        XCTAssertEqual(findMarkerOfSize(signal: test_01, size: 14), 19)
+        XCTAssertEqual(findMarkerOfSize(signal: test_02, size: 14), 23)
+        XCTAssertEqual(findMarkerOfSize(signal: test_03, size: 14), 23)
+        XCTAssertEqual(findMarkerOfSize(signal: test_04, size: 14), 29)
+        XCTAssertEqual(findMarkerOfSize(signal: test_05, size: 14), 26)
     }
 }
