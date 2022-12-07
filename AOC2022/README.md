@@ -14,6 +14,7 @@ What I've learned so far:
 - Start of functional programming with Swift collections
 - Swift's switch operations
 - How to structure a Swift package and modules
+- Unit testing
 
 ## Day 3
 
@@ -29,3 +30,7 @@ What I've learned so far:
 - Struct and class definitions
 - stride vs range for for-in loops
 - Array splicing using Array.Slices
+
+## Day 6
+
+- test methods need to start with "test"!!!
