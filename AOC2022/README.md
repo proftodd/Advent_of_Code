@@ -34,3 +34,9 @@ What I've learned so far:
 ## Day 6
 
 - test methods need to start with "test"!!!
+
+## Day 7
+
+- Protocols
+- Difference in behavior between structs and classes
+- Closures (not as much as I'd like, but enough to get the job done)

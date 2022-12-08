@@ -48,9 +48,9 @@ public class Directory: FileSystemObject {
         if (predicate(self)) {
             collector.append(self)
         }
-        let subdirs = self.contents
+        self.contents
             .compactMap { $0 as? Directory }
-        subdirs.forEach { $0.findMatchingDirectories(collector: &collector, predicate: predicate) }
+            .forEach { $0.findMatchingDirectories(collector: &collector, predicate: predicate) }
     } 
 
     // func traverse(_ theFunc: @escaping (Directory) -> Void) -> Void {
