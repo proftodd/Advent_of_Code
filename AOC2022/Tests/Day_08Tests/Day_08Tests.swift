@@ -33,6 +33,11 @@ final class Day_08Tests: XCTestCase {
         XCTAssertFalse(forest[3, 3].visible)
 
         XCTAssertEqual(forest.count( { $0.visible }), 21)
+
+        XCTAssertEqual(forest[2, 1].scenicScore, 4)
+        XCTAssertEqual(forest[2, 3].scenicScore, 8)
+
+        XCTAssertEqual(forest.max( { $0.scenicScore }), 8)
     }
 
     func testGetSightline() {
@@ -45,5 +50,19 @@ final class Day_08Tests: XCTestCase {
 
         let sl3 = forest.getSightline(coord: (2, 2), direction: getTransform(Direction.east))
         XCTAssertEqual(sl3, [3, 2])
+    }
+
+    func testGetScenicScore() {
+        let forest = Forest(lines)
+        let t1 = forest[2, 3]
+        let sl1 = forest.getSightline(coord: t1.coordinates, direction: getTransform(Direction.south))
+        let tti1 = sl1.firstIndex(where: { $0 >= t1.height }) ?? sl1.count - 1
+        let v1 = sl1.prefix(tti1 + 1)
+        XCTAssertEqual(v1, [3])
+
+        let sl2 = forest.getSightline(coord: t1.coordinates, direction: getTransform(Direction.north))
+        let tti2 = sl2.firstIndex(where: { $0 >= t1.height }) ?? sl2.count - 1
+        let v2 = sl2.prefix(tti2 + 1)
+        XCTAssertEqual(v2, [3, 5])
     }
 }

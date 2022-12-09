@@ -19,6 +19,7 @@ public class Tree {
     var height: Int
     var forest: Forest
     lazy var visible = determineVisibility()
+    lazy var scenicScore = determineScenicScore()
 
     init(coordinates: (Int, Int), height: Int, forest: Forest) {
         self.coordinates = coordinates
@@ -32,6 +33,16 @@ public class Tree {
             .map { self.forest.getSightline(coord: self.coordinates, direction: $0) }
             .map { $0.allSatisfy({ $0 < self.height }) }
             .contains(where: { $0 })
+    }
+
+    func determineScenicScore() -> Int {
+        return Direction.allCases
+            .map { getTransform($0) }
+            .map { self.forest.getSightline(coord: self.coordinates, direction: $0) }
+            .map { ($0.firstIndex(where: { $0 >= self.height }) ?? $0.count - 1, $0) }
+            .map { $0.1.prefix($0.0 + 1) }
+            .map { $0.count }
+            .reduce(1, *)
     }
 }
 
@@ -75,6 +86,19 @@ public class Forest {
             }
         }
         return count
+    }
+
+    public func max(_ scoringFunc: (Tree) -> Int) -> Int {
+        var max = Int.min
+        for y in 0..<self.height {
+            for x in 0..<self.width {
+                let thisValue = scoringFunc(self[x, y])
+                if thisValue > max {
+                    max = thisValue
+                }
+            }
+        }
+        return max
     }
 
     public func getSightline(coord: (Int, Int), direction: (Int, Int)) -> [Int] {
