@@ -3,14 +3,14 @@ public enum Direction: CaseIterable {
     case east
     case south
     case west
-}
 
-func getTransform(_ direction: Direction) -> (Int, Int) {
-    switch (direction) {
-        case .north: return (0, -1)
-        case .east: return (1, 0)
-        case .south: return (0, 1)
-        case .west: return (-1, 0)
+    var transform: (Int, Int) {
+        switch (self) {
+            case .north: return (0, -1)
+            case .east: return (1, 0)
+            case .south: return (0, 1)
+            case .west: return (-1, 0)
+        }
     }
 }
 
@@ -29,16 +29,14 @@ public class Tree {
 
     func determineVisibility() -> Bool {
         return Direction.allCases
-            .map { getTransform($0) }
-            .map { self.forest.getSightline(coord: self.coordinates, direction: $0) }
+            .map { self.forest.getSightline(coord: self.coordinates, direction: $0.transform) }
             .map { $0.allSatisfy({ $0 < self.height }) }
             .contains(where: { $0 })
     }
 
     func determineScenicScore() -> Int {
         return Direction.allCases
-            .map { getTransform($0) }
-            .map { self.forest.getSightline(coord: self.coordinates, direction: $0) }
+            .map { self.forest.getSightline(coord: self.coordinates, direction: $0.transform) }
             .map { ($0.firstIndex(where: { $0 >= self.height }) ?? $0.count - 1, $0) }
             .map { $0.1.prefix($0.0 + 1) }
             .map { $0.count }

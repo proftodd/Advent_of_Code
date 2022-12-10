@@ -40,3 +40,8 @@ What I've learned so far:
 - Protocols
 - Difference in behavior between structs and classes
 - Closures (not as much as I'd like, but enough to get the job done)
+
+## Day 8
+
+- More with closures
+- Enum methods and properties
