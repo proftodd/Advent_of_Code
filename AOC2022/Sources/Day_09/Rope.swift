@@ -29,8 +29,12 @@ public enum Direction: String {
     }
 }
 
-public class Head {
-    var position: Coordinate
+public protocol Knot {
+    var position: Coordinate { get }
+}
+
+public class Head: Knot {
+    public var position: Coordinate
 
     init() {
         position = Coordinate(x: 0, y: 0)
@@ -42,12 +46,14 @@ public class Head {
     }
 }
 
-public class Tail {
-    var position: Coordinate
-    var head: Head
+public class Tail: Knot {
+    var number: Int
+    public var position: Coordinate
+    var head: Knot
     var logger: Set<Coordinate>
 
-    init(_ head: Head) {
+    init(number: Int, head: Knot) {
+        self.number = number
         position = Coordinate(x: 0, y: 0)
         self.head = head
         logger = Set<Coordinate>()
@@ -66,7 +72,7 @@ public class Tail {
             } else if head.position.y < self.position.y {
                 self.position.y -= 1
             }
-            // print("Tail now at \(position)")
+            // print("\tTail [\(number)] now at [\(position)]")
             logger.insert(position)
         }
     }
@@ -79,13 +85,19 @@ public class Tail {
 
 public class Rope {
     var head: Head
-    var tail: Tail
+    var tails: [Tail]
     var moves: [String]
 
-    init(_ moves: [String]) {
+    init(knotCount: Int, moves: [String]) {
         self.moves = moves
         self.head = Head()
-        self.tail = Tail(self.head)
+        self.tails = []
+        var prevKnot: Knot = self.head
+        for i in 1..<knotCount {
+            let tail = Tail(number: i, head: prevKnot)
+            tails.append(tail)
+            prevKnot = tail
+        }
     }
 
     func simulate() {
@@ -98,7 +110,9 @@ public class Rope {
             let number = Int(parts[1])!
             for _ in 1...number {
                 head.move(direction)
-                tail.move()
+                for tail in tails {
+                    tail.move()
+                }
             }
         }
     }
