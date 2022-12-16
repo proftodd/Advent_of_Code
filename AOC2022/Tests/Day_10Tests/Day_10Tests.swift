@@ -160,13 +160,23 @@ final class Day_10Tests: XCTestCase {
        ""
     ]
 
+    let expectedScreen = """
+##..##..##..##..##..##..##..##..##..##..
+###...###...###...###...###...###...###.
+####....####....####....####....####....
+#####.....#####.....#####.....#####.....
+######......######......######......####
+#######.......#######.......#######.....
+"""
+
     func testCpu() {
         let cpu1 = Cpu(lines_1)
-        let signal1 = cpu1.execute()
+        let (signal1, _) = cpu1.execute()
         XCTAssertEqual(0, signal1)
 
         let cpu2 = Cpu(lines_2)
-        let signal2 = cpu2.execute()
+        let (signal2, screen) = cpu2.execute()
         XCTAssertEqual(13140, signal2)
+        XCTAssertEqual(expectedScreen, screen)
     }
 }

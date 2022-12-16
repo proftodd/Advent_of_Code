@@ -7,14 +7,16 @@ public class Cpu {
         self.instructions = instructions
     }
 
-    public func execute() -> Int {
+    public func execute() -> (Int, String) {
         var x = 1
         var cycle = 0
         var index = 0
         var signals: [Int] = []
         var arg = ""
+        var screen = ""
 
         while (index < instructions.count) {
+            let cursor = cycle % 40
             cycle += 1
             // print("cycle = \(cycle), x = \(x)")
             if ((cycle - 20) % 40 == 0) {
@@ -22,6 +24,17 @@ public class Cpu {
                 // print("\tAdding value to signals: \(value)")
                 signals.append(value)
             }
+
+            // print("during cycle \(cycle), cursor is at position \(cursor) and x is at position \(x)")
+            if (abs(x - cursor) < 2) {
+                screen += "#"
+            } else {
+                screen += "."
+            }
+            if (cursor == 39) {
+                screen += "\n"
+            }
+
             if (arg == "") {
                 let instruction = instructions[index]
                 switch (instruction) {
@@ -43,6 +56,10 @@ public class Cpu {
             }
         }
 
-        return signals.reduce(0, +)
+        if (screen.hasSuffix("\n.")) {
+            screen = String(screen.dropLast(2))
+        }
+
+        return (signals.reduce(0, +), screen)
     }
 }
