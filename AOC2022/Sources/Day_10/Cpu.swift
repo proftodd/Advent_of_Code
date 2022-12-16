@@ -8,40 +8,39 @@ public class Cpu {
     }
 
     public func execute() -> Int {
-        var register = 1
+        var x = 1
         var cycle = 0
+        var index = 0
         var signals: [Int] = []
-        
-        for instruction in instructions {
-            switch (instruction) {
-                case "noop":
-                    cycle += 1
-                    // print("cycle = \(cycle), op = \(instruction), register = \(register)")
-                    if ((cycle - 20) % 40 == 0) {
-                        // print("\tAdding value to signal: \(cycle * register)")
-                        signals.append(cycle * register)
-                    }
-                    break
-                case _ where instruction.hasPrefix("addx"):
-                    cycle += 1
-                    // print("cycle = \(cycle), op = \(instruction), register = \(register)")
-                    if ((cycle - 20) % 40 == 0) {
-                        // print("\tAdding value to signal: \(cycle * register)")
-                        signals.append(cycle * register)
-                    }
-                    cycle += 1
-                    // print("cycle = \(cycle), op = \(instruction), register = \(register)")
-                    if ((cycle - 20) % 40 == 0) {
-                        // print("\tAdding value to signal: \(cycle * register)")
-                        signals.append(cycle * register)
-                    }
-                    let args = instruction.components(separatedBy: .whitespaces)
-                    let addition = Int(args[1])!
-                    register += addition
-                default:
-                    print("Instruction not recognized: [\(instruction)]")
-            }
+        var arg = ""
 
+        while (index < instructions.count) {
+            cycle += 1
+            // print("cycle = \(cycle), x = \(x)")
+            if ((cycle - 20) % 40 == 0) {
+                let value = cycle * x
+                // print("\tAdding value to signals: \(value)")
+                signals.append(value)
+            }
+            if (arg == "") {
+                let instruction = instructions[index]
+                switch (instruction) {
+                    case "noop":
+                        // print("\tnoop: taking no action")
+                        break
+                    case _ where (instruction.hasPrefix("addx")):
+                        let args = instruction.components(separatedBy: .whitespaces)
+                        arg = args[1]
+                        // print("\taddx: setting arg to \(arg), and taking no further action")
+                    default:
+                        print("Instruction not recognized: \(instruction)")
+                }
+                index += 1
+            } else {
+                x += Int(arg)!
+                // print("\t x is now \(x)")
+                arg = ""
+            }
         }
 
         return signals.reduce(0, +)
