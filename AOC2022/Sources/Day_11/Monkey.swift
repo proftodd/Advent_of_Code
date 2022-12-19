@@ -1,18 +1,49 @@
 import Foundation
 
+func gcd(_ x: Int, _ y: Int) -> Int {
+    var a = 0
+    var b = max(x, y)
+    var r = min(x, y)
+
+    while r != 0 {
+        a = b
+        b = r
+        r = a % b
+    }
+
+    return b
+}
+
+func calcLcm(_ x: Int, _ y: Int) -> Int {
+    return x / gcd(x, y) * y
+}
+
 public class Barrel {
     public var monkeys: [Monkey]
+    public lazy var lcm = monkeys.map { $0.divisor }.reduce(1, calcLcm)
 
-    init(_ lines: [String]) {
+    init(_ lines: [String], worryModerator: Int?) {
         monkeys = []
         for i in 0..<lines.count / 7 {
-            let monkey = Monkey(barrel: self, notes: Array(lines[i * 7...i * 7 + 6]))
+            let monkey = Monkey(barrel: self, notes: Array(lines[i * 7...i * 7 + 6]), worryModerator: worryModerator)
             self.monkeys.append(monkey)
         }
     }
 
-    public func act() {
-        monkeys.forEach { $0.act() }
+    public func act(_ reps: Int) {
+        for _ in 1...reps {
+            monkeys.forEach { $0.act() }
+        }
+    }
+
+    public func report(_ round: Int) -> String {
+        return """
+        == After round \(round) ==
+        Monkey \(monkeys[0].number) inspected items \(monkeys[0].itemsHandled) times
+        Monkey \(monkeys[1].number) inspected items \(monkeys[1].itemsHandled) times
+        Monkey \(monkeys[2].number) inspected items \(monkeys[2].itemsHandled) times
+        Monkey \(monkeys[3].number) inspected items \(monkeys[3].itemsHandled) times 
+        """
     }
 
     public func monkeyBusiness() -> Int {
@@ -21,6 +52,13 @@ public class Barrel {
             .prefix(2)
             .map { $0.itemsHandled }
             .reduce(1, *)
+        // let sortedMonkeys = monkeys
+        //     .sorted { $0.itemsHandled > $1.itemsHandled }
+        //     .prefix(2)
+        //     .map { $0.itemsHandled }
+        // print("Most active monkey: \(sortedMonkeys[0])")
+        // print("Next most active monkey: \(sortedMonkeys[1])")
+        // return sortedMonkeys.reduce(1, *)
     }
 }
 
@@ -28,14 +66,17 @@ public class Monkey {
     var barrel: Barrel
     var number: Int
     var items: [Int]
-    let operation: (Int) -> Int
-    let test: (Int) -> Bool
-    let trueTarget: Int
-    let falseTarget: Int
+    var _divisor: Int
+    var divisor: Int { get { return _divisor } }
+    var operation: (Int) -> Int
+    var test: (Int) -> Bool
+    var trueTarget: Int
+    var falseTarget: Int
     var _itemsHandled: Int
     var itemsHandled: Int { get { return _itemsHandled } }
+    var worryModerator: Int?
 
-    init(barrel: Barrel, notes: [String]) {
+    init(barrel: Barrel, notes: [String], worryModerator: Int?) {
         self.barrel = barrel
 
         self.number = Monkey.getNumber(notes[0])
@@ -52,8 +93,9 @@ public class Monkey {
         }
         // print("\tOperation: new = old \(operation) \(argument)")
 
-        let testArgument = Monkey.getTestArgument(notes[3])
-        self.test = { $0 % testArgument == 0 }
+        let aDivisor = Monkey.getTestArgument(notes[3])
+        self._divisor = aDivisor
+        self.test = { $0 % aDivisor == 0 }
         // print("\tTest: divisible by \(testArgument)")
 
         self.trueTarget = Monkey.getTarget(notes[4])
@@ -63,6 +105,7 @@ public class Monkey {
         // print("\t\tfalse target = \(self.falseTarget)")
 
         _itemsHandled = 0
+        self.worryModerator = worryModerator
     }
 
     public static func getNumber(_ line: String) -> Int {
@@ -176,16 +219,16 @@ public class Monkey {
         }
     }
 
-    public static func processWorryLevel(_ currentWorryLevel: Int) -> Int {
-        return currentWorryLevel / 3
-    }
-
     public func act() {
         _itemsHandled += items.count
         while items.count > 0 {
             var item = items.removeFirst()
             item = operation(item)
-            item = Monkey.processWorryLevel(item)
+            if self.worryModerator == nil {
+                item %= self.barrel.lcm
+            } else {
+                item = item / self.worryModerator!
+            }
             if test(item) {
                 barrel.monkeys[trueTarget].addItem(item)
             } else {

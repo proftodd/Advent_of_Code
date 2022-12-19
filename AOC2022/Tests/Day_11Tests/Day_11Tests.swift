@@ -35,15 +35,24 @@ final class Day_11Tests: XCTestCase {
     ]
     
     func testItParsesMonkeysFromNotes() {
-        let barrel = Barrel(lines)
+        let barrel = Barrel(lines, worryModerator: nil)
         XCTAssertEqual(4, barrel.monkeys.count)
     }
 
+    func testFindLcm() {
+        let barrel = Barrel(lines, worryModerator: nil)
+        XCTAssertEqual(96_577, barrel.lcm)
+    }
+
     func testAct() {
-        let barrel = Barrel(lines)
-        for _ in 1...20 {
-            barrel.act()
-        }
+        let barrel = Barrel(lines, worryModerator: 3)
+        barrel.act(20)
         XCTAssertEqual(10605, barrel.monkeyBusiness())
+    }
+
+    func testAct2() {
+        let barrel = Barrel(lines, worryModerator: nil)
+        barrel.act(10_000)
+        XCTAssertEqual(2_713_310_158, barrel.monkeyBusiness())
     }
 }
