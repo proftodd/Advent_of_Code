@@ -45,3 +45,7 @@ What I've learned so far:
 
 - More with closures
 - Enum methods and properties
+
+## Day 11
+
+- Regular expressions

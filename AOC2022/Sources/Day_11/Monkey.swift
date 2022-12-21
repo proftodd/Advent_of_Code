@@ -1,5 +1,7 @@
 import Foundation
 
+// Implementation of gcd and lcm:
+// https://gist.github.com/aniltv06/6f3e9c6208e27a89259919eeb3c3d703
 func gcd(_ x: Int, _ y: Int) -> Int {
     var a = 0
     var b = max(x, y)

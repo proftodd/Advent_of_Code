@@ -10,6 +10,7 @@ import Day_08
 import Day_09
 import Day_10
 import Day_11
+import Day_12
 
 enum AdventOfCodeError: Error {
     case noCommandGiven
@@ -22,7 +23,7 @@ enum AdventOfCodeError: Error {
 public struct AOC2022 {
     public static func main() throws {
         let dayRange = 1...25
-        let implementedRange = 1...11
+        let implementedRange = 1...12
         let day = UserDefaults.standard.integer(forKey: "day")
 
         if !dayRange.contains(day) {
@@ -54,6 +55,7 @@ public struct AOC2022 {
             case 9: Day_09.main(lines)
             case 10: Day_10.main(lines)
             case 11: Day_11.main(lines)
+            case 12: Day_12.main(lines)
             default: throw AdventOfCodeError.commandNotImplemented
         }
     }
