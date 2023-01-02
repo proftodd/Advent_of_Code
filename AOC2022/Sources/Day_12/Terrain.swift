@@ -39,7 +39,7 @@ public class Terrain {
 	public var lines: [String]
 	lazy var start: Coordinate = findLocation("S")
 	lazy var end: Coordinate = findLocation("E")
-	lazy var routes: [[Coordinate]] = findRoutes()
+	lazy var routes: [[Coordinate]] = findRoutesRecursive()
 
 	init(_ lines: [String]) {
 		let filteredLines = lines.filter { $0 != "" }
@@ -119,5 +119,43 @@ public class Terrain {
 		}
 
         return routes.sorted(by: { $0.count < $1.count })
+	}
+
+	func findRoutesRecursive() -> [[Coordinate]] {
+		func extendRoute(currentRoute: [Coordinate], direction: Direction) -> [[Coordinate]] {
+			let currentPoint = currentRoute.last!
+			let nextPoint = currentPoint + direction.transform
+
+			if currentRoute.contains(where: { $0 == nextPoint }) {
+				return []
+			}
+
+			guard let currentElevation = getElevation(currentPoint) else {
+				return []
+			}
+
+			guard let nextElevation = getElevation(nextPoint) else {
+				return []
+			}
+
+			if Int(exactly: nextElevation.asciiValue!)! - Int(exactly: currentElevation.asciiValue!)! > 1 {
+				return []
+			}
+
+			let extendedRoute = currentRoute + [nextPoint]
+
+			if nextPoint == end {
+				return [extendedRoute]
+			}
+
+			return Direction.allCases
+				.filter { $0 != direction }
+				.flatMap { extendRoute(currentRoute: extendedRoute, direction: $0) }
+		}
+
+		let startingRoute = [start]
+		return Direction.allCases
+			.flatMap { extendRoute(currentRoute: startingRoute, direction: $0) }
+			.sorted(by: { $0.count < $1.count })
 	}
 }
