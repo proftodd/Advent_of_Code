@@ -15,8 +15,8 @@ public enum Direction: CaseIterable {
 }
 
 public class Coordinate: CustomStringConvertible, Equatable {
-	var x: Int
-	var y: Int
+	public var x: Int
+	public var y: Int
 	public var description: String { return "Coordinate: (\(x),\(y))" }
 
 	init(_ x: Int, _ y: Int) {
@@ -33,6 +33,27 @@ public class Coordinate: CustomStringConvertible, Equatable {
 	}
 }
 
+public class DijkstraCell: Hashable {
+	public var coord: Coordinate
+	public var visited: Bool
+	public var distance: Int
+
+	init(coord: Coordinate) {
+		self.coord = coord
+		visited = false
+		distance = Int.max
+	}
+
+    public static func == (lhs: DijkstraCell, rhs: DijkstraCell) -> Bool {
+        return lhs.coord == rhs.coord
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(coord.x)
+        hasher.combine(coord.y)
+    }
+}
+
 public class Terrain {
 	public var height: Int
 	public var width: Int
@@ -40,6 +61,7 @@ public class Terrain {
 	lazy var start: Coordinate = findLocation("S")
 	lazy var end: Coordinate = findLocation("E")
 	lazy var routes: [[Coordinate]] = findRoutesRecursive()
+	lazy var shortestRouteLength = findShortestRouteLength()
 
 	init(_ lines: [String]) {
 		let filteredLines = lines.filter { $0 != "" }
@@ -157,5 +179,54 @@ public class Terrain {
 		return Direction.allCases
 			.flatMap { extendRoute(currentRoute: startingRoute, direction: $0) }
 			.sorted(by: { $0.count < $1.count })
+	}
+
+	func findShortestRouteLength() -> Int {
+// 		print("findShortestRouteLength started")
+		var cells: [[DijkstraCell]] = []
+
+		for j in 0..<lines.count {
+			var thisRow: [DijkstraCell] = []
+			for i in 0..<lines[j].count {
+				let c = Coordinate(i, j)
+// 				print("creating Dijkstra cell with coordinate \(c)")
+				thisRow.append(DijkstraCell(coord: c))
+			}
+			cells.append(thisRow)
+		}
+
+// 		print("Starting with consideration of \(self.start)")
+        let startingCell = cells[self.start.y][self.start.x]
+        startingCell.distance = 0
+		var underConsideration:Set<DijkstraCell> = [startingCell]
+// 		print("under consideration: \(underConsideration.count) cells")
+		let endCell = cells[self.end.y][self.end.x]
+// 		print("Looking for distance to \(endCell.coord)")
+
+		while !endCell.visited {
+			let current = underConsideration.min(by: { $0.distance < $1.distance })!
+			underConsideration.remove(current)
+			let currentElevation = Int(exactly: getElevation(current.coord)!.asciiValue!)!
+			// print("current cell: \(current.coord) elevation: \(currentElevation) distance: \(current.distance) under consideration: \(underConsideration.count)")
+			for d in Direction.allCases {
+				let neighborCoord = current.coord + d.transform
+				if neighborCoord.x < 0 || neighborCoord.x >= width ||
+				   neighborCoord.y < 0 || neighborCoord.y >= height {
+				   continue
+			    }
+				let neighbor = cells[neighborCoord.y][neighborCoord.x]
+				if neighbor.visited {
+					continue
+				}
+				let neighborElevation = getElevation(neighbor.coord)!
+				if Int(exactly: neighborElevation.asciiValue!)! - currentElevation <= 1 {
+					neighbor.distance = min(neighbor.distance, current.distance + 1)
+					underConsideration.insert(neighbor)
+				}
+			}
+			current.visited = true
+		}
+
+		return endCell.distance
 	}
 }
