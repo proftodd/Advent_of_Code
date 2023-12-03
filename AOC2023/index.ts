@@ -1,6 +1,7 @@
 import fs from 'fs'
 import readline from 'readline'
 import greeter from './src/greeter'
+import day_01 from './src/day_01/day'
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -16,8 +17,6 @@ let puzzleInput: string[]
 console.log(greeter(2023))
 rl.question('Which day would you like to run? ', s => {
     puzzleInput = getInput(parseInt(s))
-    puzzleInput.forEach(line =>  {
-        console.log(line)
-    })
+    day_01(puzzleInput)
     rl.close()
 })
