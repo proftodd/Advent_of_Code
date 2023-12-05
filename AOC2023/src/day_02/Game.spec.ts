@@ -44,6 +44,11 @@ describe('game', () => {
         const testGame = new Game('Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red')
         expect(testGame.possible({ red: 12, green: 13, blue: 14 })).toBe(false)
     })
+
+    it('calculates power', () => {
+        const testGame = new Game('Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red')
+        expect(testGame.power()).toBe(1560)
+    })
 })
 
 describe('driver', () => {
@@ -54,5 +59,13 @@ describe('driver', () => {
             .map(g => g.gameNumber)
             .reduce((partialSum, id) => partialSum + id, 0)
         expect(sumOfIds).toBe(8)
+    })
+
+    it('correctly calculates power', () => {
+        const sumOfPower = testData
+            .map(d => new Game(d))
+            .map(g => g.power())
+            .reduce((partialSum, p) => partialSum + p, 0)
+        expect(sumOfPower).toBe(2286)
     })
 })

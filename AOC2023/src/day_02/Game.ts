@@ -12,6 +12,15 @@ class Game {
     possible(draw: Draw): boolean {
         return this.plays.every(p => p.possible(draw))
     }
+
+    power(): number {
+        const minimumSet: Draw = this.plays
+            .reduce(
+                (agg, p) => ({ red: Math.max(agg.red, p.red), green: Math.max(agg.green, p.green), blue: Math.max(agg.blue, p.blue) }),
+                { red: 0, green: 0, blue: 0 }
+            )
+        return  minimumSet.red * minimumSet.green * minimumSet.blue
+    }
 }
 
 class Play {
