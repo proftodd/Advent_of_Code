@@ -21,18 +21,43 @@ describe('schematic', () => {
         expect(schematic.width).toBe(10)
     })
 
-    it('recognizes numbers', () => {
-        expect(schematic.numbers).toContainEqual({ position: new Point(0, 0), length: 3, number: 467 })
-    })
+    describe('parts', () => {
+        it('recognizes numbers', () => {
+            const expected = {
+                position: new Point(0, 0),
+                length: 3,
+                number: 467,
+                adjacentCharacters: [
+                    { position: new Point(-1, -1), character: '.' },
+                    { position: new Point(0, -1), character: '.' },
+                    { position: new Point(1, -1), character: '.' },
+                    { position: new Point(2, -1), character: '.' },
+                    { position: new Point(3, -1), character: '.' },
+                    { position: new Point(-1, 0), character: '.' },
+                    { position: new Point(0, 0), character: '4' },
+                    { position: new Point(1, 0), character: '6' },
+                    { position: new Point(2, 0), character: '7' },
+                    { position: new Point(3, 0), character: '.' },
+                    { position: new Point(-1, 1), character: '.' },
+                    { position: new Point(0, 1), character: '.' },
+                    { position: new Point(1, 1), character: '.' },
+                    { position: new Point(2, 1), character: '.' },
+                    { position: new Point(3, 1), character: '*' }]
+            }
+            // const observed = schematic.numbers[0]
+            // expect(observed).toStrictEqual(expected)
+            expect(schematic.numbers).toContainEqual(expected)
+        })
 
-    it('distinguishes parts from numbers', () => {
-        expect(schematic.parts).toContain(467)
-        expect(schematic.parts).not.toContain(114)
-        expect(schematic.parts).not.toContain(58)
-    })
+        it('distinguishes parts from numbers', () => {
+            expect(schematic.parts).toContain(467)
+            expect(schematic.parts).not.toContain(114)
+            expect(schematic.parts).not.toContain(58)
+        })
 
-    it('calculates sum of part numbes', () => {
-        const sumOfPartNumbers = schematic.parts.reduce((partialSum, p) => partialSum + p, 0)
-        expect(sumOfPartNumbers).toBe(4361)
+        it('calculates sum of part numbes', () => {
+            const sumOfPartNumbers = schematic.parts.reduce((partialSum, p) => partialSum + p, 0)
+            expect(sumOfPartNumbers).toBe(4361)
+        })
     })
 })
