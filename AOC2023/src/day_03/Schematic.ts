@@ -4,6 +4,7 @@ class Schematic {
     width: number
     numbers: { position: Point, length: number, number: number, adjacentCharacters: { position: Point, character: string }[] }[]
     parts: number[]
+    gears: Array<{ position: Point, parts: number[] }>
 
     constructor(lines: string[]) {
         this.lines = lines
@@ -52,6 +53,25 @@ class Schematic {
         this.parts = this.numbers
             .filter(n => n.adjacentCharacters.some(c => c.character != '.' && (c.character < '0' || c.character > '9')))
             .map(n => n.number)
+        // console.log(this.numbers[0])
+        const gearList: Array<{ position: Point, parts: number[] }> = this.numbers.flatMap(n => {
+            return n.adjacentCharacters
+                .filter(ac => ac.character === '*')
+                .map(ac => ({ position: ac.position, parts: [n.number] }))
+            }
+        )
+        // console.log(gearList)
+        this.gears = gearList.reduce((acc: Array<{ position: Point, parts: number[] }>, g: { position: Point, parts: number[] }) => {
+            const key = g.position
+            var existingGear = acc.find(gg => gg.position.x === key.x && gg.position.y === key.y)
+            if (existingGear) {
+                existingGear.parts = [...existingGear.parts, g.parts].flat()
+            } else {
+                acc = [...acc, g]
+            }
+            return acc
+        }, [])
+        .filter(g => g.parts.length > 1)
     }
 }
 
@@ -64,5 +84,10 @@ class Point {
         this.y = y
     }
 }
+
+// class Gear {
+//     position: Point
+//     parts: number[]
+// }
 
 export { Schematic, Point }

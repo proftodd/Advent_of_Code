@@ -60,4 +60,21 @@ describe('schematic', () => {
             expect(sumOfPartNumbers).toBe(4361)
         })
     })
+
+    describe('gears', () => {
+        it('finds gears correctly', () => {
+            const p1 = new Point(3, 1)
+            const p2 = new Point(5, 8)
+            const p3 = new Point(3, 4)
+            expect(schematic.gears.find(g => g.position.x === p1.x && g.position.y === p1.y)).toStrictEqual({ position: p1, parts: [467, 35] })
+            expect(schematic.gears.find(g => g.position.x === p2.x && g.position.y === p2.y)).toStrictEqual({ position: p2, parts: [755, 598] })
+            expect(schematic.gears.find(g => g.position.x === p3.x && g.position.y === p3.y)).toBeFalsy()
+        })
+
+        it('calculates gear ratio correctly', () => {
+            const gearRatios = schematic.gears.map(g => g.parts.reduce((gp, g) => gp * g, 1))
+            const gearRatioSum = gearRatios.reduce((grs, gr) => grs + gr, 0)
+            expect(gearRatioSum).toBe(467835)
+        })
+    })
 })
