@@ -1,7 +1,9 @@
-import { Card } from './Card'
+import { Card, Deck } from './Card'
 
 export default function process(data: string[]): void {
-    const deck = data.map(line => new Card(line))
-    const totalScore = deck.reduce((partialSum, c) => partialSum + c.score, 0)
-    console.log(`Deck score = ${totalScore}`)
+    const cards = data.map(line => new Card(line))
+    const totalScore = cards.reduce((partialSum, c) => partialSum + c.score, 0)
+    console.log(`Score of cards = ${totalScore}`)
+    const deck = new Deck(data)
+    console.log(`Deck score = ${deck.score}`)
 }

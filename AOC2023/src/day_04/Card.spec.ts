@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { Card } from './Card'
+import { Card, Deck } from './Card'
 
 const testData = [
     'Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53',
@@ -28,5 +28,13 @@ describe('card', () => {
         // cards.forEach(c => console.log(c.score))
         const totalScore = cards.reduce((partialSum, c) => partialSum + c.score, 0)
         expect(totalScore).toBe(13)
+    })
+})
+
+describe('deck', () => {
+    const testDeck = new Deck(testData)
+    // console.log(testDeck)
+    it('calculates correct deck score', () => {
+        expect(testDeck.score).toBe(30)
     })
 })
