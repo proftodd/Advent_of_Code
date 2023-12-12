@@ -1,7 +1,7 @@
 import { Game, Play } from './Game'
 
 export default function process(data: string[]): void {
-    const games = data.map(line => new Game(line))
+    const games = data.filter(line => line != '').map(line => new Game(line))
     const probe = { red: 12, green: 13, blue: 14 }
     const sumOfIds = games
         .filter(g => g.possible(probe))
