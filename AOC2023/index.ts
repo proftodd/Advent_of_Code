@@ -8,7 +8,7 @@ const rl = readline.createInterface({
 })
 
 const getInput = (dayString: string): string[] => {
-    var filename = `../input/2023/${dayString}/input.txt`
+    const filename = `../input/2023/${dayString}/input.txt`
     return fs.readFileSync(filename, 'utf8').split('\n')
 }
 

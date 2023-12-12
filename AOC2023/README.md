@@ -10,3 +10,9 @@ This year it's Typescript. Here are the steps I used to set up the repo.
 1. Add an `index.ts` file.
 1. Run the code: `npx tsc; node build/index.js`
 1. Add a test package: `npm install --save-dev vitest`; run tests `npm run test`.
+
+Later learned there are ways to run and test the Typescript code directly without transpiling:
+
+- `npm install --save ts-node`
+- To test the code: `npx vitest`
+- To run the code: `npx ts-node index.ts`

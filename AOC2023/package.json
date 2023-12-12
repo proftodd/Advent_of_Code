@@ -5,6 +5,10 @@
     "vitest": "^0.34.6"
   },
   "scripts": {
+    "ci-build": "npx tsc",
     "test": "vitest"
+  },
+  "dependencies": {
+    "ts-node": "^10.9.2"
   }
 }
