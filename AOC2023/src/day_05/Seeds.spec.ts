@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getSeeds, groupLines, identityMapper, makeCompositeMapper, makeSimpleMapper, makeTopLevelMapper, simpleMapper, NamedFullMapper } from './Seeds'
+import { getSeeds, getSeedsFromRanges, groupLines, identityMapper, makeCompositeMapper, makeSimpleMapper, makeTopLevelMapper, simpleMapper, NamedFullMapper } from './Seeds'
 
 const testData = [
     'seeds: 79 14 55 13',
@@ -112,5 +112,11 @@ describe('TopLevelMapper', () => {
 describe('getSeeds', () => {
     it('parses seeds correctly', () => {
         expect(getSeeds(testData[0])).toStrictEqual([79, 14, 55, 13])
+    })
+})
+
+describe('getSeedsFromRanges', () => {
+    it('parses seeds correctly', () => {
+        expect(getSeedsFromRanges(testData[0]).length).toBe(27)
     })
 })

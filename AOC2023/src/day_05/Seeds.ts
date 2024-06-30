@@ -83,4 +83,17 @@ function getSeeds(seedLine: string): number[] {
         .map(s => parseInt(s))
 }
 
-export { getSeeds, groupLines, identityMapper, makeCompositeMapper, makeSimpleMapper, makeTopLevelMapper, simpleMapper, NamedFullMapper }
+function getSeedsFromRanges(seedLine: string): number[] {
+    const seeds = []
+    const seedEntries = seedLine.split(/ +/).slice(1)
+    for (let i = 0; i < seedEntries.length; i += 2) {
+        const startingSeed = parseInt(seedEntries[i])
+        const seedRange = parseInt(seedEntries[i + 1])
+        for (let j = 0; j < seedRange; ++j) {
+            seeds.push(startingSeed + j)
+        }
+    }
+    return seeds
+}
+
+export { getSeeds, getSeedsFromRanges, groupLines, identityMapper, makeCompositeMapper, makeSimpleMapper, makeTopLevelMapper, simpleMapper, NamedFullMapper }

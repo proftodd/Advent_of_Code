@@ -1,4 +1,4 @@
-import { getSeeds, groupLines, makeTopLevelMapper } from './Seeds'
+import { getSeeds, getSeedsFromRanges, groupLines, makeTopLevelMapper } from './Seeds'
 
 export default function process(data: string[]): void {
     const groupedLines = groupLines(data)
@@ -6,9 +6,15 @@ export default function process(data: string[]): void {
     const mapper = makeTopLevelMapper(groupedLines)
     console.log(`seeds = ${seeds}`)
     const distances = seeds.map(s => [s, mapper(s)])
-    distances.forEach(d => {
-        console.log(`${d[0]} => ${d[1]}`)
-    })
+    // distances.forEach(d => {
+    //     console.log(`${d[0]} => ${d[1]}`)
+    // })
     const min = distances.reduce((prev, curr) => prev[1] < curr[1] ? prev : curr)
     console.log(`The seed with the minimum distance is ${min[0]} with a distance of ${min[1]}`)
+
+    console.log('With seed ranges')
+    const seedsFromRanges = getSeedsFromRanges(groupedLines[0][0])
+    const distancesFromRanges = seedsFromRanges.map(s => [s, mapper(s)])
+    const minFromRanges = distancesFromRanges.reduce((prev, curr) => prev[1] < curr[1] ? prev : curr)
+    console.log(`The seed with the minimum distance is ${minFromRanges[0]} with a distance of ${minFromRanges[1]}`)
 }
