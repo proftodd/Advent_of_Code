@@ -83,17 +83,43 @@ function getSeeds(seedLine: string): number[] {
         .map(s => parseInt(s))
 }
 
-function getSeedsFromRanges(seedLine: string): number[] {
-    const seeds = []
+function getSeedRanges(seedLine: string): Array<Array<number>> {
+    const seedRanges = []
     const seedEntries = seedLine.split(/ +/).slice(1)
     for (let i = 0; i < seedEntries.length; i += 2) {
         const startingSeed = parseInt(seedEntries[i])
-        const seedRange = parseInt(seedEntries[i + 1])
-        for (let j = 0; j < seedRange; ++j) {
-            seeds.push(startingSeed + j)
-        }
+        const seedCount = parseInt(seedEntries[i + 1])
+        seedRanges.push([startingSeed, seedCount])
     }
-    return seeds
+    return seedRanges
 }
 
-export { getSeeds, getSeedsFromRanges, groupLines, identityMapper, makeCompositeMapper, makeSimpleMapper, makeTopLevelMapper, simpleMapper, NamedFullMapper }
+const arrayRange = (start: number, length: number) =>
+    Array.from(
+        { length: length },
+        (_, index) => start + index
+    )
+
+const partitionRange = (start: number, range: number, splits: number) => {
+    const partitions: Array<Array<number>> = []
+    const width = Math.floor(range / splits)
+    for (let i = 0; i < splits - 1; ++i) {
+        partitions.push([start + i * width, start + (i + 1) * width - 1])
+    }
+    partitions.push([start + (splits - 1) * width, start + range - 1])
+    return partitions
+}
+
+export {
+    getSeeds,
+    getSeedRanges,
+    arrayRange,
+    groupLines,
+    identityMapper,
+    makeCompositeMapper,
+    makeSimpleMapper,
+    makeTopLevelMapper,
+    simpleMapper,
+    NamedFullMapper,
+    partitionRange
+}

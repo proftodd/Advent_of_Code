@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { getSeeds, getSeedsFromRanges, groupLines, identityMapper, makeCompositeMapper, makeSimpleMapper, makeTopLevelMapper, simpleMapper, NamedFullMapper } from './Seeds'
+import {
+    getSeeds,
+    getSeedRanges,
+    groupLines,
+    identityMapper,
+    makeSimpleMapper,
+    makeTopLevelMapper,
+    simpleMapper,
+    NamedFullMapper,
+    partitionRange
+} from './Seeds'
 
 const testData = [
     'seeds: 79 14 55 13',
@@ -115,8 +125,36 @@ describe('getSeeds', () => {
     })
 })
 
-describe('getSeedsFromRanges', () => {
+describe('getSeedRanges', () => {
     it('parses seeds correctly', () => {
-        expect(getSeedsFromRanges(testData[0]).length).toBe(27)
+        expect(getSeedRanges(testData[0])).toStrictEqual([[79, 14], [55, 13]])
+    })
+})
+
+describe('map ranges of seeds', () => {
+    it('maps ranges of seeds correctly', () => {
+        const groups = groupLines(testData)
+        const topLevelMapper = makeTopLevelMapper(groups)
+        const ranges = getSeedRanges(testData[0])
+        let minDistance = { seed: -1, distance: Number.MAX_SAFE_INTEGER }
+        for (let i = 0; i < ranges.length; ++i) {
+            const [start, count] = ranges[i]
+            for (let j = 0; j < count; ++j) {
+                const value = start + j
+                const mappedValue = topLevelMapper(value)
+                if (mappedValue < minDistance.distance) {
+                    minDistance = { seed: value, distance: mappedValue }
+                }
+            }
+        }
+        expect(minDistance).toStrictEqual({ seed: 82, distance: 46 })
+    })
+})
+
+describe('partitionRanges', () => {
+    it('partitions ranges correctly', () => {
+        expect(partitionRange(79, 14, 4)).toStrictEqual([[79, 81], [82, 84], [85, 87], [88, 92]])
+        expect(partitionRange(55, 13, 4)).toStrictEqual([[55, 57], [58, 60], [61, 63], [64, 67]])
+        expect(partitionRange(55, 13, 1)).toStrictEqual([[55, 67]])
     })
 })
