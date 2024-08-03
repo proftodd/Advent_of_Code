@@ -54,10 +54,7 @@ function makeSimpleMapper(line: string): OptionalMapper {
 function makeCompositeMapper(lines: string[]): FullMapper {
     const mappers = lines.map(makeSimpleMapper)
     return (x: number): number => {
-        let r = mappers[0](x, null)
-        for (let i = 1; i < mappers.length; ++i) {
-            r = mappers[i](x, r)
-        }
+        const r = mappers.reduce((acc, mapper) => mapper(x, acc), mappers[0](x, null))
         return identityMapper(x, r)
     }
 }
