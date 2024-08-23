@@ -61,16 +61,11 @@ function makeCompositeMapper(lines: string[]): FullMapper {
 
 function makeTopLevelMapper(groups: string[][]): FullMapper {
     const mappers = groups.slice(1).map(g => new NamedFullMapper(g))
-    return (x: number): number => {
-        let r = mappers[0].map(x)
-        // console.log(`${mappers[0].name}.map(${x}) = ${r}`)
-        for (let i = 1; i < mappers.length; ++i) {
-            // const prevR = r
-            r = mappers[i].map(r)
-            // console.log(`${mappers[i].name}.map(${prevR}) = ${r}`)
-        }
-        return r
-    }
+    return (x: number): number =>
+        mappers.slice(1).reduce(
+            (r, m) => m.map(r),
+            mappers[0].map(x)
+        )
 }
 
 function getSeeds(seedLine: string): number[] {
